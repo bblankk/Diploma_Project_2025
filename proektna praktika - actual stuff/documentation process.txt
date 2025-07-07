@@ -58,4 +58,6 @@ ALR ~!!!! WE HAVE A KERNEL WITH NOTHING IN ITTT. AND ITS CONNECTED TO THE BOOTLO
 - environment troubles: most tutorials assume i'm on linux, and use linux tools. unforutnately this isn't the case, and i shall sooner rather than later hit a block in my path. i have got a github setup, now time to setup my linux.
 - Tail has been tried and doesn't work because no root access. rip.
 
+a kernel has been made. time to add stuff to it..
+-first part: a file system. i decided on FAT32 after careful consideration. "The boot record contains both code and data, mixed together. The data that isn't code is known as the BPB." First we must implement the boot record uwu.
 
