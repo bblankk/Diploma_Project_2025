@@ -1,0 +1,53 @@
+1. download HxD, fasmw , and qemu. 
+2. time to startup the bootloader . listen, for this part, i first did a solo bootloader - assembled it - put it on a lil disk file - and ran w qemu. unfortunately this booted nothing but worked
+moving on, i learned that bootloaders typically have 2 parts 
+1st part usually boots the second part.
+ya bios originally works w/ about 512 bite space. thats not a lot. you're gonna use this space to load your second part into the memory.
+2nd part - this one does the magicks. with more space to work around, now we're in part two. this should typically:
+Setup 16-bit segment registers and stack
+Print startup message
+Check presence of PCI, CPUID, MSRs
+Enable and confirm enabled A20 line
+Load GDTR
+Inform BIOS of target processor mode
+Get memory map from BIOS
+Locate kernel in filesystem
+Allocate memory to load kernel image
+Load kernel image into buffer
+Enable graphics mode
+Check kernel image ELF headers
+Enable long mode, if 64-bit
+Allocate and map memory for kernel segments
+Setup stack
+Setup COM serial output port
+Setup IDT
+Disable PIC
+Check presence of CPU features (NX, SMEP, x87, PCID, global pages, TCE, WP, MMX, SSE, SYSCALL), and enable them
+Assign a PAT to write combining
+Setup FS/GS base
+Load IDTR
+Enable APIC and setup using information in ACPI tables
+Setup GDT and TSS
+
+but dont worry about it yet. 
+3. i setup a live flash with linux distro. :( my entire working environment is now portable buuut unfortunately i forgot that live sessions delete everything on exit. 
+on the to-do list is to partition a small part of my flash (the same flash, yes) just for my project.
+todo cancelled: that's actually not gonna work. The bootable flash can't be read from the booted system. aka the live linux i've got running can't access the project partition. rip
+todo, new: re-do the live linux into a (dead) portable linux so i can keep my damn files. Why did I decide it would be cool/secure to make a live distro? help.
+4. okay, you're wondering where to go from here. time to build a kernel. part 2 needs to boot a kernel, after all, and i'm not sure how this is all supposed to combine and compile, so i've started
+searching for  yt tutorials. the OSDev wiki is scary, but don't worry and just read on. These things will start to make sense eventually, i'm sure...
+after looking through linux distros with tears in my eyes, i've found 2 - puppyLinux and Tails. I'm going to go with tails, as it seems to be more in tune with USB sticks and overall saving data while keeping the amnesia aspect. 
+I did not consider this and find it interesting, so perhaps I WILL ADD THIS IDEA TO THE FINAL PROJECT.
+speaking of the final project, i've noticed that when downloading other OS-es to try , it usually gives me a .img (disk file)... perhaps I should've gotten the memo sooner, but the final project needs to be in .img or .iso format.
+I'm ... well, I guess, that's how you're supposed to store an OS. (yes, perhaps, i should've known this sooner).
+Big new problem. the Tails OS is incredibly slow and forces me to use TOR browser. fuck security.. and fuck this flash! why is it so slow? cry. i also can't use root commands because "having root permissions would negate the purpose of the OS!" YOUR MOOOOOTHEEEEERRRRRRRRR
+okay its okay. we're gonna continue rawdogging it on windows. except i can't run docker on windows, which i would've loved to have for the 99% of tutorials online. its okay. we're gonna do it with other tools.
+so far my biggest struggles come from setting up the environment lmfao... i need a PC that can run over 2mph with FULL root access everywhere all the time (i'm gonna install 3k packages per project before shoving it all on github and baptising the hdd)
+speaking of, it would  be awesome to have an hdd to do this on. like a spare one. but who just has a spare hdd lying around?
+.... I do.
+TODO:
+put the spare HDD into a usb caddy. use it instead of the flash as a portable environment. please.
+TIP: DID YOU KNOW YOU DIDNT HAVE TO GO TO BIOS TO CHANGE UR OS ?? U CAN PRESS THE WINDOWS KEY, HOLD SHIFT WHILE YOU PRESS POWER-RESTART , KEEP HOLDING IT, AND FROM THE BLUE LOOKIN MENU IN -OTHER DEVICES - CHOOSE YOUR FLASH. YYESS GAWDDD (SOB)
+
+
+
