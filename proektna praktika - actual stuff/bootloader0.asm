@@ -2,37 +2,38 @@
 [org 0x7C00]
 
 start:
-    xor ax, ax
+    xor ax, ax              ; Clear the registers
     mov ds, ax
     mov es, ax
 
     ; BIOS read 1 sector from cylinder=0, head=0, sector=2 into 0x0000:0x8000
-    mov ah, 0x02      ; BIOS read sectors
-    mov al, 1         ; read 1 sector
-    mov ch, 0         ; cylinder 0
-    mov cl, 2         ; sector 2
-    mov dh, 0         ; head 0
-    mov dl, 0         ; drive 0 (floppy)
-    mov bx, 0x8000    ; offset
-    int 0x13
-    jc disk_error     ; jump if error (carry set)
+    mov ah, 0x02            ; BIOS read sectors
+    mov al, 1               ; read 1 sector
+    mov ch, 0               ; cylinder 0
+    mov cl, 2               ; sector 2
+    mov dh, 0               ; head 0
+    mov dl, 0               ; drive 0 (floppy)
+    mov bx, 0x8000          ; offset in memory (0x8000)
+    int 0x13                ; BIOS interrupt for disk operations
+    jc disk_error           ; jump if error (carry set)
 
-    jmp 0x0000:0x8000 ; jump to bootloader1
+    ; Jump to second stage (bootloader1) at 0x8000
+    jmp 0x0000:0x8000
 
 disk_error:
-    mov si, err_msg
+    mov si, err_msg         ; Error message string
 .print_loop:
-    lodsb
-    or al, al
-    jz $
-    mov ah, 0x0E
-    int 0x10
-    jmp .print_loop
+    lodsb                   ; Load byte from string into AL
+    or al, al               ; Check if AL is zero (end of string)
+    jz $                    ; Jump if zero (end of string)
+    mov ah, 0x0E            ; BIOS teletype output function
+    int 0x10                ; BIOS interrupt to print char
+    jmp .print_loop         ; Repeat
 
 err_msg db 'Disk read error!',0
 
-times 510 - ($ - $$) db 0
-dw 0xAA55
+times 510 - ($ - $$) db 0   ; Fill remaining space with zeros
+dw 0xAA55                   ; Boot signature
 
 
 

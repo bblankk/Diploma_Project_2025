@@ -49,5 +49,13 @@ TODO:
 put the spare HDD into a usb caddy. use it instead of the flash as a portable environment. please.
 TIP: DID YOU KNOW YOU DIDNT HAVE TO GO TO BIOS TO CHANGE UR OS ?? U CAN PRESS THE WINDOWS KEY, HOLD SHIFT WHILE YOU PRESS POWER-RESTART , KEEP HOLDING IT, AND FROM THE BLUE LOOKIN MENU IN -OTHER DEVICES - CHOOSE YOUR FLASH. YYESS GAWDDD (SOB)
 
+day2:
+let's try building the kernel. just something simple so far, no need to cry... its gonna be ookay baby!
+- i'm having trouble making the disc floppy img. windows doesn't have many tools for it. I had ChatGPT make me a .bat (windows batch file) and it.. helps. i guess there's a function to make them in windows..?
+haha having the whole compiler in one space is neat! i dont have to assemble every time and make a new disc and so on, i can just run ths lil batch file. love bat files. 
+ALR ~!!!! WE HAVE A KERNEL WITH NOTHING IN ITTT. AND ITS CONNECTED TO THE BOOTLOADER (CRY)
+\yipeeeEEEEEEE BUEHEHEH. we also added everything to the github <3
+- environment troubles: most tutorials assume i'm on linux, and use linux tools. unforutnately this isn't the case, and i shall sooner rather than later hit a block in my path. i have got a github setup, now time to setup my linux.
+- Tail has been tried and doesn't work because no root access. rip.
 
 
