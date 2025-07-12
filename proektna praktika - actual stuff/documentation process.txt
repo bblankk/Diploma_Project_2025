@@ -61,3 +61,34 @@ ALR ~!!!! WE HAVE A KERNEL WITH NOTHING IN ITTT. AND ITS CONNECTED TO THE BOOTLO
 a kernel has been made. time to add stuff to it..
 -first part: a file system. i decided on FAT32 after careful consideration. "The boot record contains both code and data, mixed together. The data that isn't code is known as the BPB." First we must implement the boot record uwu.
 
+I fixed MY PC ~!! YIPEE? Now i've got my env setup forreals. AND I finally figured out my idea - so, what makes my bootloader unique? Imma let it "boot-load" whatever the heck. Who said it's gotta be an OS? Let it load anything the bios can. Use bios tools and boot me a gif, an img, a project, an .iso, a - heck, a txt. Let it try. Let it conquer. I want it to be able to "bootload" whatever the heck, starting with scripts.
+The stuff its gonna boot will be on the same flash.
+Here's the basic goal - bootloader project, slap it on a flash with literally anything else, and on startup (when selected device to boot from is said project flash) my bootloader'll do its best to boot whatever the heck is on the flash, aside from it. 
+Let it boot nonsense. Isn't that fun? 
+With the idea done, let's see how we'll implement. 
+It currently runs the kernel in the same subfolder, but I need it to run *anything* in this subfolder (which will probably be hard and use gypsie-level gimmicks), and maybe implement... girl, idk, am I gonna need drivers? Can the basic bios functions do me good? I guess it's time to find out.
+
+hey friend, new run technique just dropped. please just go ./build.sh in the terminal :).
+
+a bit of knowlege to present during the presenting stage on monday:
+"When a PC powers on, here’s what the BIOS (or UEFI in modern systems) does:
+
+    Power-On Self Test (POST): Checks CPU, RAM, and basic hardware.
+
+    Boot Device Selection: Based on your BIOS settings or boot order (e.g., USB → HDD → CD), it picks the first device that claims to be bootable.
+
+    Reads Sector 0 (LBA 0): BIOS reads the very first 512 bytes of that device. This is the boot sector — no filesystem is parsed at this point. It doesn't care what format the device is (FAT32, NTFS, ext4 — irrelevant).
+
+    Looks for the Boot Signature:
+
+        It checks if the last two bytes are 0x55 and 0xAA (in that order, little endian: 0xAA55).
+
+        This is a signal that "I’m executable boot code!"
+
+    Loads to memory at 0x7C00: BIOS loads those 512 bytes into memory at address 0x7C00.
+
+    Jumps to 0x7C00: Execution begins — the CPU starts running your 16-bit real mode boot sector code.:
+" this will help people understand how the BIOS gets to the bootloader on startup
+- next stage of presenting, what a BOOTLOADER does.
+
+

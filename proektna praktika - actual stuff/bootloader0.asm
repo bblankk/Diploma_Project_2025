@@ -2,20 +2,22 @@
 [org 0x7C00]
 
 start:
-    xor ax, ax              ; Clear the registers
-    mov ds, ax
-    mov es, ax
+    mov ax, 0              ; Clear the registers. memory segmentation in real mode (startup mode) uses these registers to access the memory, so we'll need them clean.
+    mov ds, ax ; datta segment (ds) and      by the way, mov is a copy (dsetination) (source) function.
+    mov es, ax ; extra segment (es) to zero.  ; by the way, you need to go throu a general purpose reg (like ax) before writing to ds or es
 
-    ; BIOS read 1 sector from cylinder=0, head=0, sector=2 into 0x0000:0x8000
+    ; BIOS read 1 sector from cylinder=0, head=0, sector=2 into 0x0000:0x8000  - this uses CHA scheme for old devices... don't worry about it
     mov ah, 0x02            ; BIOS read sectors
-    mov al, 1               ; read 1 sector
+    mov al, 4               ; read the next 4 sectors (2 to 5) (i've decided that'll be the size of our stage2 bootloader.
     mov ch, 0               ; cylinder 0
     mov cl, 2               ; sector 2
-    mov dh, 0               ; head 0
+    mov dh, 0               ; head 0 (floppy)
     mov dl, 0               ; drive 0 (floppy)
     mov bx, 0x8000          ; offset in memory (0x8000)
     int 0x13                ; BIOS interrupt for disk operations
     jc disk_error           ; jump if error (carry set)
+    
+;to sum up the top thing: Hi BIOS, please read 1 sector from the disk and dump it into memory at 0x0000:0x8000.
 
     ; Jump to second stage (bootloader1) at 0x8000
     jmp 0x0000:0x8000
