@@ -13,7 +13,7 @@ start:
     mov cl, 2               ; sector 2
     mov dh, 0               ; head 0 (floppy)
     mov dl, 0               ; drive 0 (floppy)
-    mov bx, 0x8000          ; offset in memory (0x8000)
+    mov bx, 0x7E00         ; offset in memory (0x8000) where stage 2 will be set
     int 0x13                ; BIOS interrupt for disk operations
     jc disk_error           ; jump if error (carry set)
     
@@ -37,15 +37,3 @@ err_msg db 'Disk read error!',0
 times 510 - ($ - $$) db 0   ; Fill remaining space with zeros
 dw 0xAA55                   ; Boot signature
 
-
-
-
-
-;how to run :"C:\Program Files\qemu\qemu-system-x86_64.exe" -drive format=raw,file=bootloader.img 
-; i've already assembled it with nasm, beware it only works (nasm( in this folder (downloads). assemble with care.
-;you need to specify full path to qemu exe if you want it to run. No adding to PATH nonsense! 
-; dont worry about the drive formatting forn ow. 
-; here's your sources : https://www.qemu.org/docs/master/system/invocation.html, https://flatassembler.net/examples.php, https://mh-nexus.de/en/hxd/ ,,
-
-;qemu can be run to simulate wherever
-; nasm can be run anywhere, but you first need to copy nasmpath and run it there LMAO

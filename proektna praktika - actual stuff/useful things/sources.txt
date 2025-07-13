@@ -2,6 +2,8 @@ here's what i learned from
 https://datacadamia.com/io/drive/lba
 https://wiki.osdev.org/Rolling_Your_Own_Bootloader#How_do_I_actually_load_bytes
 https://wiki.osdev.org/FAT
+https://www.qemu.org/docs/master/system/invocation.html
+https://flatassembler.net/examples.php, https://mh-nexus.de/en/hxd/ 
 
 here's what i used:
 geany (text editor but for assembly)

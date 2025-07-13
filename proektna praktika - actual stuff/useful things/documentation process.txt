@@ -91,4 +91,16 @@ a bit of knowlege to present during the presenting stage on monday:
 " this will help people understand how the BIOS gets to the bootloader on startup
 - next stage of presenting, what a BOOTLOADER does.
 
+Current requirements when building (be careful)
+bootloader0 - 1st sector of the disk
+bootloader1 - 2 to 5th sectors
+kernel - from the 6th onwards
+type of FS: FAT12
+- be careful when making the floppy to specify these^
+
+TODO: bootloader1 has to implement a FS. This has been decided as FAT12 after (not very long) consideration.
+
+PSA: terribly late of me to notice this, but it doesn't matter what the size of the source code file is. bootloader0.asm can be 3kb if it wants, because this includes white spaces and comments and so on. What matters is the assembled binary output - .bin file - now THAT'S gotta be exactly 512 bytes. And it is. 
+
+
 
