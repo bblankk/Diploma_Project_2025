@@ -102,5 +102,7 @@ TODO: bootloader1 has to implement a FS. This has been decided as FAT12 after (n
 
 PSA: terribly late of me to notice this, but it doesn't matter what the size of the source code file is. bootloader0.asm can be 3kb if it wants, because this includes white spaces and comments and so on. What matters is the assembled binary output - .bin file - now THAT'S gotta be exactly 512 bytes. And it is. 
 
+The floppy being created is now being created in FAT12. I made the presentation and removed unnecessary comments ( i hope) from the rest of the porject. Let this document be the only evidence left of my meltdowns and hardships.
+The kernel is currently not being run by the second stage. The problem comes from the FAT12 phrasing - the second stage can't get any data from the FAT12 boot sector on 0th sector. It returns all nulls. This means there's problems with the formatting, or the second stage's idea of a formatting, which ... yeah, i'm rambling, but that means we can't move on to connect it to the kernel.
 
 

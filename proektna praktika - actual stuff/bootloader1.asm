@@ -29,11 +29,9 @@ start:
     jmp .print_loop         ; Repeat
 
 .after_msg:
-    ; -------------------------------
-    ; DISPLAY SOME INFO FROM THE FAT
-    ; -------------------------------
-    mov si, fatmsg          ; some label msg
-    call print_string
+   ;display some info from the FAT
+    mov si, fatmsg          ; putting the fatmsg in the si register
+    call print_string       ; prints the label message using this handy dandy function that loves the si register
 
     mov bx, 0x7C00          ; boot sector lives here! BIOS loaded it for us <3
 
@@ -55,16 +53,13 @@ start:
     mov ax, [bx + 17]
     call print_hex
 
-    ; --------------------------------
-    ; ALL DONE — just halt the system
-    ; --------------------------------
+  ;halt time
     cli                     ; Disable interrupts
     hlt                     ; Halt the CPU (infinite halt)
-    jmp $                   ; Infinite loop (you can also just leave it hanging here)
+    jmp $                   ; Infinite loop 
 
-; ----------------------------------------------------------------
-; print_string: Print null-terminated string starting at DS:SI
-; ----------------------------------------------------------------
+
+; Print null-terminated string starting at DS:SI
 print_string:
     lodsb
     or al, al
@@ -75,9 +70,7 @@ print_string:
 .done:
     ret
 
-; ----------------------------------------------------------------
 ; print_hex: print AX as a 4-digit uppercase hexadecimal number
-; ----------------------------------------------------------------
 print_hex:
     pusha
     mov cx, 4               ; loop 4 times (16 bits / 4 bits per digit)
@@ -107,9 +100,8 @@ disk_error:
     cli
     hlt
     jmp $
-; ----------------------------------------------------------------
-; DATA
-; ----------------------------------------------------------------
+
+; data 
 errormsg db 0x0D, 0x0A, 'Disk read error!', 0
 msg db 'Hello from bootloader1!', 0
 fatmsg db 0x0D, 0x0A, 'FAT12 fields: ', 0  ; newline then message
