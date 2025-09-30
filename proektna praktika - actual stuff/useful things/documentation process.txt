@@ -118,6 +118,7 @@ ld --version
 as --version
 nasm --version
 grub-mkrescue --version
-
+also, these dependencies : build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo wget
+and, yeah, a new and ADVANCED FLAVOUR of binutils! as if we didn't download 3 million of these tools already !
 
 
