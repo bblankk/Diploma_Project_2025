@@ -105,4 +105,19 @@ PSA: terribly late of me to notice this, but it doesn't matter what the size of 
 The floppy being created is now being created in FAT12. I made the presentation and removed unnecessary comments ( i hope) from the rest of the porject. Let this document be the only evidence left of my meltdowns and hardships.
 The kernel is currently not being run by the second stage. The problem comes from the FAT12 phrasing - the second stage can't get any data from the FAT12 boot sector on 0th sector. It returns all nulls. This means there's problems with the formatting, or the second stage's idea of a formatting, which ... yeah, i'm rambling, but that means we can't move on to connect it to the kernel.
 
+day4:
+ahem, ya girl is back from spring break, and finally read the OSDEV wiki. Weeee're gonna need a GCC cross platform compiler. don't ask, i don't k now, the wiki said so, so we're doing it. im also on linux mint now.
+- on compiler bootstrapping : uhh, wow? i didn't know ts was so complicated. Okay so, we need the same version of the compiler for the OG and the cross - which i'm just gonna push as the lastest gcc ver. atp in time it's 13.3.0 .
+! er, also, it would be great to include Trello screenshots in the final version. Yes, just fake it if you gotta..!! TT
+day5: Today we're gonna setup cross-compiling. Yes, we had that setup before. Yes, we have to do it again. I changed systems, remember? 
+Finally, It's been decided that we're doing a 32-bit kernel first. GRUB (a community bootloader) works only for 32bit , and it's supposedly an easier starter.
+
+please verify that these tools are available, from now on:
+gcc --version
+ld --version
+as --version
+nasm --version
+grub-mkrescue --version
+
+
 
