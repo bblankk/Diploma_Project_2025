@@ -121,4 +121,12 @@ grub-mkrescue --version
 also, these dependencies : build-essential bison flex libgmp3-dev libmpc-dev libmpfr-dev texinfo wget
 and, yeah, a new and ADVANCED FLAVOUR of binutils! as if we didn't download 3 million of these tools already !
 
+verify the availability of your new cross compiler: 
+i686-elf-gcc --version
+i686-elf-as --version
 
+PS. I set up the 32-bit cross-compiler (i686-elf) while being very sick. Everybody, please clap? you'll find it at $HOME/opt/cross/bin, and it's added to PATH.
+TODO: recover and un-corrupt the images from your old partition since it seems to be.. 'unlocked' now. yeah, don't ask.
+
+NEXT up, configuring GRUB. (i am loosing my sparkle , but my fingers itch to get started. This is the last hurdle before full-on kernel development, so let's just do it)
+PS. The entire repository has been renamed to "diploma project 2025". The old name was "proektna praktika 2025". I'm going to polish the github around this time so it doesn't cause problems in the future. 
