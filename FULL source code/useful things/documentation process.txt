@@ -130,3 +130,19 @@ TODO: recover and un-corrupt the images from your old partition since it seems t
 
 NEXT up, configuring GRUB. (i am loosing my sparkle , but my fingers itch to get started. This is the last hurdle before full-on kernel development, so let's just do it)
 PS. The entire repository has been renamed to "diploma project 2025". The old name was "proektna praktika 2025". I'm going to polish the github around this time so it doesn't cause problems in the future. 
+
+oct7 
+The repository has been cleaned up and submitted. Starting GRUB configuration.
+- installed dependencies: grub-pc-bin, xorriso
+
+In isodir run this to make the iso: 
+grub-mkrescue -o myos.iso .
+
+oct8
+Raspberry pi OS - btw yours is a raspberry pi 5 ! To Throw apart the legacy 32 bit version.
+- Kernel should be the same as some of the debian ones.
+- OS for rm models ?
+
+oct12
+Bought an sd card and finally configured the raspberry :) . Should I make a system for it? Or start with a simple port reading? I'm so excited :2
+
