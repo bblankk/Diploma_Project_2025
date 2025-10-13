@@ -135,8 +135,18 @@ oct7
 The repository has been cleaned up and submitted. Starting GRUB configuration.
 - installed dependencies: grub-pc-bin, xorriso
 
-In isodir run this to make the iso: 
-grub-mkrescue -o myos.iso .
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+In kernel folder to make the kernel.elf
+i686-elf-gcc -ffreestanding -m32 -O2 -Wall -Wextra -c kernel.c -o kernel.o
+i686-elf-gcc -ffreestanding -nostdlib -m32 -T linker.ld -o kernel.elf kernel.o
+Shove the new kernel.elf in isodir/boot
+In parent of isodir run this to make the iso: 
+grub-mkrescue -o myos.iso isodir
+To run with qemu:
+qemu-system-i386 -cdrom myos.iso
+
+verify iso contents:
+xorriso -indev myos.iso -ls /boot
 
 oct8
 Raspberry pi OS - btw yours is a raspberry pi 5 ! To Throw apart the legacy 32 bit version.
@@ -146,3 +156,32 @@ Raspberry pi OS - btw yours is a raspberry pi 5 ! To Throw apart the legacy 32 b
 oct12
 Bought an sd card and finally configured the raspberry :) . Should I make a system for it? Or start with a simple port reading? I'm so excited :2
 
+oct13
+- 'metodologiq' which is a part of your documentation, make sure it's handwritten lol.
+- presentation with little diagrams for the conceptual part, and then little debugger stuff that works :) slide for motivation/context/what's the point of it all?
+Kernel updates, we're working on I/O. Today we've implemented a naked environment, CPU is fully in control:
+what's going on there:
+1. The bootloader (GRUB) hands control to kernel.elf in protected mode
+2. the kernel:
+Writes to video memory directly
+Enters an infinite loop so the CPU doesn’t return to GRUB
+
+ I'm going to put an abstraction layer on top and start building a console, maybe support with BIOS calls after.
+TODO -No syscalls, no filesystem, no standard library, no memory allocator.paging is off (yipee)(to enable)
+| You want to... | You must...                            |
+| -------------- | -------------------------------------- |
+| Print text     | Write to VGA memory (like 0xB8000)     |
+| Read keyboard  | Handle interrupts from PS/2 controller |
+| Use storage    | Implement disk driver                  |
+| Manage memory  | Implement paging/heap/allocators       |
+| Handle files   | Build a filesystem layer               |
+
+
+We currently can use in kernel code: CPU instructions, function calls, stack frames.
+
+Oh my gosh, did you know that int and long change their size based on compiler/architecture?:
+The size of int is equal to sizeof(int). The size of an int is really compiler dependent. Back in the day, when processors were 16 bit, an int was 2 bytes. Nowadays, it's most often 4 bytes on a 32-bit as well as 64-bit systems. 
+you learn something new every day. This means we can't use our beloved unsigned integers in the kernel code... aw, jeez.
+
+
+ 
