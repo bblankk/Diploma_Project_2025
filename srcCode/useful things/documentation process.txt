@@ -140,15 +140,19 @@ In kernel folder to make the kernel.elf
 i686-elf-gcc -ffreestanding -m32 -O2 -Wall -Wextra -c kernel.c -o kernel.o
 i686-elf-gcc -ffreestanding -nostdlib -m32 -T linker.ld -o kernel.elf kernel.o
 Shove the new kernel.elf in isodir/boot
-In isodir run this to make the iso: 
+In isodir momma run this to make the iso: 
 grub-mkrescue -o myos.iso .
 To run with qemu:
 qemu-system-i386 -cdrom myos.iso
+qemu-system-x86_64 -cdrom myos.iso
 
 verify iso contents:
 xorriso -indev myos.iso -ls /boot
 verify elf contents:
 readelf -h kernel.elf
+
+or you could load the kernel directly without an ISO:
+qemu-system-i386 -kernel kernel.elf
 
 oct8
 Raspberry pi OS - btw yours is a raspberry pi 5 ! To Throw apart the legacy 32 bit version.
@@ -189,4 +193,26 @@ Currently goes into grub , then my kernel, but there's somehing wrong with the k
 TODO: setup gdb!
 
 ! uninitialized memory works as a loop. don't go there.
- 
+update: OMAGASH!! IT WORKS!!!! WOWOZERS!!! IT WOOOORKSSSS IT GOES INTO THE KERNEL, SETS UP THE STUPID STINKIN' TERMINAL AND SO ON !!! LETS GOOOOOOOOOOOOOOOOOOO
+step 0/100 complete, lol. Now to actually make the kernel XD!
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+new command line for assembling the header, compiling the kernel, linking , and finally shoving to qemu. IM THE BEST???
+
+assembling multibootheader: 
+nasm -f elf32 multiBootHeader.asm -o multiBootHeader.o
+compiling kernel:
+gcc -m32 -ffreestanding -c kernel.c  -o kernel.o
+linking em:
+ld -m elf_i386 -T linker.ld -o kernel.elf multiBootHeader.o kernel.o
+qemu:
+qemu-system-i386 -kernel kernel.elf
+
+or use the makefile (from kernel folder):
+make // everything goes in build folder
+make run //runs the elf in there
+make clean //removes build folder
+
+
+
+

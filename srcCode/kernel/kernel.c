@@ -19,14 +19,6 @@ __attribute__((section(".multiboot"))) const uint32_t multiboot_header[] = {
 };
 // DONT REMOVE THIS ITS THE MULTIBOOT MAGIC !!
 
-
-// stack definition - also crucial
-#define STACK_SIZE 0x4000  // 16 KB stack SIZE
-// "every time you see STACK_SIZE in the code, replace it with the value 0x4000". its a const int situation.
-uint8_t kernel_stack[STACK_SIZE] __attribute__((aligned(16))); //array of unsigned ints named kernel_stack , as big as the stack size
-//reserve a block of memory that's [STACK SIZE] bytes, aligned to a 16byte boundadry to use later as my kernel's stack^
-
-
 #define VGA_WIDTH 80  
 #define VGA_HEIGHT 25
 #define VGA_ADDRESS 0xB8000  //starting ADDRESS of the terminal frame buffer
@@ -101,8 +93,6 @@ void terminal_write(const char* data) {
 
 //main 
 void kmain(void) {
-
-asm volatile("movl %0, %%esp" : : "r"(kernel_stack + STACK_SIZE));  //setting stack to the beginning of the kernel_stack array
 
 
     terminal_initialize();
