@@ -207,12 +207,16 @@ linking em:
 ld -m elf_i386 -T linker.ld -o kernel.elf multiBootHeader.o kernel.o
 qemu:
 qemu-system-i386 -kernel kernel.elf
-
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 or use the makefile (from kernel folder):
 make // everything goes in build folder
 make run //runs the elf in there
 make clean //removes build folder
 
-
+oct21
+uh, multiboot time. aka memory map time. aka into the unknown territory.
+Okay, apparently there's 2 multiboot headers: multiboot1 (older, and widely supported, and easier on the tutorials) and multiboot2 (newer, "more flexible" , gives more information, still supported by qemu and grub, but apparently a bit harder to start on).
+It'll be harder to swtich later so we're making decisions now - and im deciding on multiboot1 , which is just FINE for a hobby OS (we aren't striving for perfection). What's worrying me is that multiboot2 is "future proof" and multiboot1 may not be supported later... but ain't that a problem for future me? haha
+So, now that we have decided on multiboot1 we're going to get the memory map in kmain.
 
 

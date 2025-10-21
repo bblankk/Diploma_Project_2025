@@ -6,24 +6,44 @@
 
 #include <stddef.h>
 #include <stdint.h> // implements fixed-width integer types int8_t, uint16_t, int32_t, and uint64_t (among others). 
-
-//uint8_t - unsigned int 8 bit 
-#define MULTIBOOT_HEADER_MAGIC    0x1BADB002
-#define MULTIBOOT_HEADER_FLAGS    0x00010003
-#define MULTIBOOT_HEADER_CHECKSUM -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
-
-__attribute__((section(".multiboot"))) const uint32_t multiboot_header[] = {
-    MULTIBOOT_HEADER_MAGIC,
-    MULTIBOOT_HEADER_FLAGS,
-    MULTIBOOT_HEADER_CHECKSUM
-};
-// DONT REMOVE THIS ITS THE MULTIBOOT MAGIC !!
-
+ 
+//GLOBALS
 #define VGA_WIDTH 80  
 #define VGA_HEIGHT 25
 #define VGA_ADDRESS 0xB8000  //starting ADDRESS of the terminal frame buffer
    
+#define MULTIBOOT_MEMORY_AVAILABLE 1
 
+
+
+typedef struct multiboot_mmap_entry {
+    uint32_t size;
+    uint64_t addr;
+    uint64_t len;
+    uint32_t type;
+} __attribute__((packed)) multiboot_mmap_entry_t;
+
+typedef struct multiboot_info {
+    uint32_t flags;
+    uint32_t mem_lower;
+    uint32_t mem_upper;
+    uint32_t boot_device;
+    uint32_t cmdline;
+    uint32_t mods_count;
+    uint32_t mods_addr;
+    uint32_t syms[4];
+    uint32_t mmap_length;
+    uint32_t mmap_addr;
+  
+} __attribute__((packed)) multiboot_info_t;
+
+
+
+
+
+
+
+// VGA/TERMINAL STUFF
 static uint16_t* const VGA_BUFFER = (uint16_t*)VGA_ADDRESS;  //each address has color and value -2 bytes = 16bits , const = we're not changing where it's pointing, it'll always point to 0xB8000, static = file-scoped, only available in this file.
 //this is the buffer pointer.
 //VGA_BUFFER[index] = something; writes directly to video memory
