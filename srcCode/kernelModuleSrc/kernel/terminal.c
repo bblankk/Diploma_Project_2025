@@ -1,46 +1,16 @@
-// we're currently in protected real mode 32bit
-//full access to address space :3
-// apparently a stack pointer has been helpfully set by GRUB already. You can use stack - related C functions.
-//currently in a nakey environment - just cpu , no libc, no bios calls.
-
+//HERE LIVE THE TERMINAL FUNCTIONALITY
 
 #include <stddef.h>
-#include <stdint.h> // implements fixed-width integer types int8_t, uint16_t, int32_t, and uint64_t (among others). 
- 
+#include <stdint.h>
+#include "terminal.h"
+
+
+// # - library, be careful with which ones work. no C libraries only definitions
+// "" - this is MY OWN header, that i made . compiled with your kernel.
 //GLOBALS
 #define VGA_WIDTH 80  
 #define VGA_HEIGHT 25
 #define VGA_ADDRESS 0xB8000  //starting ADDRESS of the terminal frame buffer
-   
-#define MULTIBOOT_MEMORY_AVAILABLE 1
-
-
-
-typedef struct multiboot_mmap_entry {
-    uint32_t size;
-    uint64_t addr;
-    uint64_t len;
-    uint32_t type;
-} __attribute__((packed)) multiboot_mmap_entry_t;
-
-typedef struct multiboot_info {
-    uint32_t flags;
-    uint32_t mem_lower;
-    uint32_t mem_upper;
-    uint32_t boot_device;
-    uint32_t cmdline;
-    uint32_t mods_count;
-    uint32_t mods_addr;
-    uint32_t syms[4];
-    uint32_t mmap_length;
-    uint32_t mmap_addr;
-  
-} __attribute__((packed)) multiboot_info_t;
-
-
-
-
-
 
 
 // VGA/TERMINAL STUFF
@@ -110,15 +80,6 @@ void terminal_write(const char* data) {
 //loops through each byte until \0 (end of string) and prints it.
 
 
+//reading memory map passed to us by GRUB bootloader.
 
-//main 
-void kmain(void) {
-
-
-    terminal_initialize();
-    terminal_write("Hello, world from kernel!\n");
-    terminal_write("This is a new line!\n");
-    terminal_write("Nice, right?");
-    for (;;) {}
-}
 
