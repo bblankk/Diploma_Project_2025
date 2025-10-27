@@ -12,6 +12,7 @@ extern kmain
 
 _headerEntryPoint:
     mov esp, stack_top
+    push ebx        ; GRUB passes multiboot info pointer in EBX, so now we push this EBX pointer to our kmain
     call kmain
 .hang:
     cli

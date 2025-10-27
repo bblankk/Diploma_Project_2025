@@ -5,8 +5,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
-void terminal_initialize(void);
-void terminal_printchar(char c);
-void terminal_write(const char* data);
+void terminal_Initialize(void);
+void terminal_Printchar(char c) ;
+void terminal_Write(const char* data);
+void terminal_PrintHex32(uint32_t num) ;
+void terminal_PrintHex64(uint64_t num);
+
+
 
 #endif

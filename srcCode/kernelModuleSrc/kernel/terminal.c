@@ -37,10 +37,10 @@ static inline uint16_t vga_entry(unsigned char uc, uint8_t color) {
 }
 
 
-void terminal_initialize(void) {
+void terminal_Initialize(void) {
     terminal_row = 0;
     terminal_column = 0;
-    terminal_color = vga_entry_color(7, 0); // initial terminal color, grey on black
+    terminal_color = vga_entry_color(13, 15); // initial terminal color, pink text on white bg
     for (size_t y = 0; y < VGA_HEIGHT; y++) {
         for (size_t x = 0; x < VGA_WIDTH; x++) {
             const size_t index = y * VGA_WIDTH + x;
@@ -51,7 +51,7 @@ void terminal_initialize(void) {
 //This sets your cursor to (0, 0), picks a color, and fills the entire screen with spaces.
 //It’s writing ' ' and 0x07 into every cell of that 0xB8000 buffer.aka initialization of the terminal
 
-void terminal_printchar(char c) {  //used to be terminalputchar
+void terminal_Printchar(char c) {  //used to be terminalputchar
     if (c == '\n') {
         terminal_row++;
         terminal_column = 0;   // is it a new line? no? skip
@@ -73,13 +73,51 @@ void terminal_printchar(char c) {  //used to be terminalputchar
 }
 //printing CHARACTERS
 
-void terminal_write(const char* data) {
+void terminal_Write(const char* data) {
     for (size_t i = 0; data[i] != '\0'; i++)
-        terminal_printchar(data[i]);
+        terminal_Printchar(data[i]);
 }
 //loops through each byte until \0 (end of string) and prints it.
 
+void terminal_PrintHex32(uint32_t num) {
+    const char* hexChars = "0123456789ABCDEF";
+    char buf[9];
+    buf[8] = '\0';
+    for (int i = 7; i >= 0; i--) {
+        buf[i] = hexChars[num & 0xF];
+        num >>= 4;
+    }
+    terminal_Write(buf);
+} // printing hex32
 
-//reading memory map passed to us by GRUB bootloader.
+void terminal_PrintHex64(uint64_t num) {
+    terminal_PrintHex32((uint32_t)(num >> 32));
+    terminal_PrintHex32((uint32_t)(num & 0xFFFFFFFF));
+} //printing hex64
 
+
+
+
+
+
+
+// VGA COLORS
+//| Number | Color name                     |
+//| ------ | ------------------------------ |
+//| 0      | black                          |
+//| 1      | blue                           |
+//| 2      | green                          |
+//| 3      | cyan                           |
+//| 4      | red                            |
+//| 5      | magenta                        |
+//| 6      | brown                          |
+//| 7      | light gray                     |
+//| 8      | dark gray                      |
+//| 9      | light blue                     |
+//| 10     | light green                    |
+//| 11     | light cyan                     |
+//| 12     | light red                      |
+//| 13     | light magenta
+//| 14     | yellow                         |
+//| 15     | white                          |
 
