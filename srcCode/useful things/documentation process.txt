@@ -219,4 +219,21 @@ Okay, apparently there's 2 multiboot headers: multiboot1 (older, and widely supp
 It'll be harder to swtich later so we're making decisions now - and im deciding on multiboot1 , which is just FINE for a hobby OS (we aren't striving for perfection). What's worrying me is that multiboot2 is "future proof" and multiboot1 may not be supported later... but ain't that a problem for future me? haha
 So, now that we have decided on multiboot1 we're going to get the memory map in kmain.
 
+oct27
+Memory map down. It's currently being outputted to the screen. All functions are in a memap.c file. oh in the multibootheader.asm , the ebx register gets pushed (passed) to kmain, because this is where GRUB stores the memory map pointer. There are two structures that get some data passed to them ... aghh...
+I also changed all the functions to follow the case conventions - functions with camel snake case, and variables with camel case. I felt it to be prettier.
+The terminal is now pink. ( took exactly one change)
+erm... im pretty happy with the memory map, so i'm going to be working more on the terminal functionality. First things first , I/O. Which means keyboard driver. Which means starting on the external drivers. Which opens another can of worms i was avoiding till now. The PIC (Programmable Interrupt Controler), hardware interrupts, and ports. Time to worry about the 0x60 port, "the data port", scancodes, and how to integrate all of that into code. (not excited about this part)
+funsies are officially finished, time for bios interrupts (sad).
+A few things to do:
+    - inter -process communication
+    - a way for programs to allcocate and free data 
+
+Forget it , we're not working on the terminal, first we need to set up some more memory stuff (agh, i hate memory stuff, agh, why is this the main focus of my project? i just don't understand it, i guess, and it's hard to debug - what am i even looking at ?!)
+
+
+oct 28th
+We need to implement physical memory, virtual memory, and  a way for programs to allocate it at all... aghh.... TT. why, god , why?? (what have i gotten myself into, pt1).
+- Four general models of memory usage in most programs, including operating systems: read-only memory, static global memory, lexically allocated memory, and dynamically allocated memory. 
+okay  , buddy , let's get to the physical memory before the virtual memory. Let's implement it... let's do it .. !!
 

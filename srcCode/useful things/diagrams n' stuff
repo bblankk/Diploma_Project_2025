@@ -1,4 +1,78 @@
 cel + motivaciq (kakvo te motivira za proekta) - zashto sme go izbrali "celta na proekta e x , treto lice govorish), arhitektura  - tehnologii etc , 
 
 
-camel snake case in the entiere project
+   ADD THEME HERE :
+ About + inspo: This is a modular operating system meant for pcs with a very specific task in mind. Modular systems aren't living up to their potential in the hands of our corporate giant friends, because they're not really modular, entirely - they're hybrid. I was inspired by Linux's modular design, where modules can be added to kernel space during runtime, and decided to take it even further . I want a specialized OS not for daily use but for a specific task, capable of running on very, very little amount of memory, and sustaining itself with little to no modules up at all.
+
+
+    Most modern modular OS devs are afraid to let the user hit base case. They're afraid of nuking a leg. Even linux won't let you turn off certain modules, because some subsystems depend on them. I want every single module to be able to running independently, including subsystems, without hitting cases like "can't be turned off because someone else is using me!".
+    The final goal is to sacrifice uneeded functionality to an extreme. For example, you load my OS, tweak it to your liking - removing the UI, the I/O drivers, the wifi-driver, the file system, and finally, the memory manager. You don't need this. You've decided you're only keeping the clock driver, which will output to somewhere (I told you, everything's self-sustainable. If it doesn't have a terminal or UI, it's going to output to a PORT. Or have the kernel buffer save it.
+    Now you've got a whole operating system running one clock. that's it. it only ticks, no fancy nothing. Does that sound boring? Sounds like less of an operating system, does it? since it's not operating your system anymore. Nevertheless, it is. it's operating. your entire system's memory is only doing one thing, and it's keeping the clock alive. Let's say you have a hundred million clocks to keep running. Let's say you need to do so on the memory of a single flash drive. Not so funny now, is it? Something needs to allocate this memory, something needs to keep count of the clocks, something needs to run them. That's all being done in a bout a Mib's worth of kernel code.
+
+TEchnologies used: C, assembly , virtualna mashina QEMU, assembler i kompilator, camel snake case in the entiere project;
+
+    about modules:
+
+    Kernel-space modules = full performance (no context switches).
+    But they’re dangerous — a bug in one can crash the entire system.
+    That’s why microkernels push things out into user space: slower, but isolated.
+    Monolithic or modular kernels keep them in for speed, trusting well-tested drivers.
+
+
+    Security issues: everything's running in kernel space. If one thing fails, we all fail! 
+    = Well... yes! If a single module cracks, the entire system will crack. Nevertheless, this system wasn't built to use all it's modules, anyways. It was built to use as FEW modules as possible, so there's less chance of error in the first place.
+
+    Open-source:
+    - let people design their own drivers too :) why not! Do you want my clock to skip every 3 seconds? Do you want it to never stop counting, going up and up, and up and up, forever, until you run out of numbers? Knock yourself out.
+    - im writing everything as understandable for anyone with even a smidgen of coding knowledge as i possibly can, full of comments and linkage explanation.
+
+    Main focus: effective memory allocation. Using recursion , the memory map will assign every single BYTE worth of space. It will force-free memory that isn't being used, who cares if it's assigned for a memory hole? Have you heard of a tree-structure? (explain the memory assigning process)
+    - kernel functionality : the last line of UI/UX defence. This is where most modules will be loaded/unloaded, and the LAST thing to turn off when you're sure everything else is exactly as you want it. Well, I plan to have a way to turn it back on automatically, specifically for segmentation faults, so don't worry...XD.
+    - DESIGN : it's very important to me that the design is top-notch. The kernel will be really the only thing absolutely needed for the final version of the system, so every time I think to myself "does this NEED to be here? Is there a way I could safely take it out?" . The design will be the second main focus of the OS, every file carefully linked, dependencies minimalized, globalized values carefully, carefully examined, etc. etc. it's all very important.
+
+    About Linkage: GRUB (well, to be changed for a smaller bootloader when i have time to make one) => a header assembly script that does all the crucial initialization (memory focused, for example, for the register esp that points to the stack) => kernel =>
+
+    - main modules
+    - main drivers
+    - memory map
+    - I/O config
+    - UI/UX
+    - peripherals
+    - file system
+    - testing, testing, please raise your hand!
+    - graphical interface
+    - wifi drivers 
+    - etc.!
+
+    Future plans: ah, i hope it can become a well-loved open-source project. I'm not the best at driver design, nor too interested, I hope the community can pick up where I've left off, I hope I can inspire people to make all kinds of interesting self-sustaining modules, or finding new ways to make old-things self-sustainable, or easily modular (for example, some file systems HATE having random functionality nuked. What do you mean, If I remove this search function, the entire file system collapses like a house of cards?)
+
+
+todo:
+structure - 
+hi im emma and this is my project blabla.
+cel - osnovni zadachi AKA main focus UP there
+motivation
+target group
+
+technologies used
+kakvo e razraboteno do tuk
+kakvo mi predstavq da razrabotq 
+
+
+
+
+ADD THE THEME AND MAIN USERS !!!
+
+add: cel : operacionna sistema koqto optimizira xxx / user grupa sushta //
+na men mi haresva -> na tozi tip grupa hora shte im haresa 
+more structure vuv otvarqneto !!! 
+don't repeat yourself
+- bez lichni emocii !!! be professional! 
+= az ako imam teq umeniq zashto bih izpolzvala tvoq proekt mesto da si napravq svoi ili druga distribuciq? //explain
+= in linkage you can say 
+
+- naduhai se. You can clap going in, clap when you're done, idk!
+
+
+
+
