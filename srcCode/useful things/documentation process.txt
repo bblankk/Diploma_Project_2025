@@ -237,3 +237,95 @@ We need to implement physical memory, virtual memory, and  a way for programs to
 - Four general models of memory usage in most programs, including operating systems: read-only memory, static global memory, lexically allocated memory, and dynamically allocated memory. 
 okay  , buddy , let's get to the physical memory before the virtual memory. Let's implement it... let's do it .. !!
 
+
+nov 10th
+i took a lil break, sue me. what was i doin before? i seem to be lacking a keyboard driver, but if memory recalls, i had memory issues too..? er
+i configured hithub copilot. if theres weird stuff i blame it. (i am aware that machines cannot take responsibility)
+
+"i wanted to make a physical memory allocator. i was wondering if i should make it in kernel or memap.c? the memap was just for the memory map so i wanted to leave it alone and clean, but i dont know if ti would be better to be there? or should i make its own file for physical memory allocation and call the functions in kernel? somehow that seems to be the best solution, doesn't it? well you give me advice. first we need to set up paging - since my kernel already knows all usable ram ranges (memap functions ) we need to put those ranges into fixed-size pages and make a bitman for those pages. im thinking 4kb pages" - im loosing my mind
+
+
+nov 11th
+I'm not really sure if I'm ready to go back to basics, but did you know that ROM is about 12mbs and only stores vital information to start the system, like the firmware, the BIOS UEFI. It's what the CPU runs first on power on. And it's pre-programmed by the person who made the device, because it's a non-programmable chip on the motherboard.
+In summary, ROM is just another way to call the BIOS chip on the motherboard. It's also called an SPI chip.
+It contains:
+Power-on initialization code
+Hardware configuration tables
+Boot device selection logic
+Option ROMs for device
+The firmware setup UI
+
+and is NOT re-programmable. I mean, it is, but there is no reason for me to tinker 'round there right now. Although I want to. I'm a bit curious. But we've got bigger problems right now!!!
+
+//The PC does have writable memory (RAM) — temporary.
+Persistent storage (SSD/HDD) is separate hardware accessed through drivers and filesystems.
+The kernel manages RAM directly and storage indirectly.
+ROM is just firmware, not general storage or memory.//
+
+so , about volatile/permanent memory. RAM's our bestie right now , but let's forget about permanent storage for the time being. let's focus on configuring our RAM allocator.
+- THE PHYSICAL MEMORY ALLOCATOR IS ONLY  A RAM ALLOCATOR, PERMANENNT MEMORY IS ON "EXTERNAL" DEVICES AND ISN'T MANAGED BY THE CPU
+
+conclusion: ABOUT RAM
+🍓 highest-level allocators: kernel heap alloc/user-space memory management management
+🍓 on top is the virtual memory layer - Maps virtual addresses to physical pages using the page tables, handles process isolation, when it needs a new page, calls the phys mem allocator
+🍓 on bot is physical memory allocator - paging, RAM pages, tracks which are free/used , provides pages to sybsystems 
+
+Now that we know a bit more, we can start writing code! I'm thinking of making the physical pages first, and track them, today. The question of whether they should be in the kernel or not remains, but I recon everything memory-management related should be. Well, nevertheless, I'm shoving them in a new file to keep my kernel "clean". Just remember to put an important star on it.
+
+Back to learning, now about paging. There's contiguous and scrambled pages. A small amount of devices expect and absolutely need a continious page alignment. Others request normal pages (which can be anywhere). What we're gonna do is split it into two:
+- a small ("edicated contiguous pool tracked by a bitmap") BITMAP in front that's continuous. This pool services DMA/firmware/driver requests that require physically contiguous pages.
+
+- a longer ("buddy allocator for the general pool") BUDDY SYSTEM in the back that's scrambled - page order doesn't matter
+ofc the virtual allocator won't be helpoing those devices get memory, but the kernel, so it's not going to touch the first BITMAP at all.
+Physical: [A][B][C][D] + [E][H][J][K][F][G][I][L]  (C-pool + G-pool)(continuous and general)
+Virtual : [H][E][K][I][J][L][G][F]
+Contiguous use → [A–D]
+
+
+TODO:
+
+Parse firmware memory map. Mark usable ranges.
+
+Pick contiguous region(s) for C-pool. Prefer low-high contiguous ranges reported usable. Carve them out and mark as C-pool.
+
+Initialize C-pool bitmap over that region.
+
+Initialize G-pool buddy allocator over remaining usable pages.
+
+Mark both pools in the global page bookkeeping so nothing else grabs those pages.
+
+//
+Bitmap for C-pool (practical)
+
+Use uint64_t words. 1 = used, 0 = free.
+
+Fast ops: ~word, __builtin_ctzll, __builtin_popcountll.
+
+Provide find_run(npages) that scans words, uses ctz on word-by-word runs to find a contiguous run of npages.
+
+Keep a hint cursor to avoid scanning from 0 each time.
+
+Lock per-pool for SMP (spinlock).
+//
+Buddy for G-pool (practical)
+
+Orders from order_min = 0 (1 page) to order_max (largest power-of-two block).
+
+Free-lists per order. On alloc, find smallest order >= npages. If not available, split larger block down. On free, try to merge with buddy.
+
+Maintain a small secondary bitmap if you want quick emptiness checks per order (optional).
+
+Lock per-order or per-region for concurrency.
+//
+Interaction between pools
+
+Keep separate metadata. The global physical bitmap can mirror both pools for debugging/inspection, but operations should be local for speed.
+
+If C-pool exhausted, choose policy:
+
+Fail allocation and return NULL.
+
+Try to allocate from G-pool and attempt to create a physically contiguous chunk by compaction (expensive) — avoid this in early kernel.
+
+Signal user that host lacks contiguous memory.
+//

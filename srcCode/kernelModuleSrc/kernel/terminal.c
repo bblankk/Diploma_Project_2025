@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "terminal.h"
-
+#include "keyboard.h"
 
 // # - library, be careful with which ones work. no C libraries only definitions
 // "" - this is MY OWN header, that i made . compiled with your kernel.

@@ -1,9 +1,12 @@
 cel + motivaciq (kakvo te motivira za proekta) - zashto sme go izbrali "celta na proekta e x , treto lice govorish), arhitektura  - tehnologii etc , 
 
 
-   ADD THEME HERE :
+   ADD THEME HERE : optimiziran modularen model na operacionna sistema
+target group: specialists who work on operating systems.
+
  About + inspo: This is a modular operating system meant for pcs with a very specific task in mind. Modular systems aren't living up to their potential in the hands of our corporate giant friends, because they're not really modular, entirely - they're hybrid. I was inspired by Linux's modular design, where modules can be added to kernel space during runtime, and decided to take it even further . I want a specialized OS not for daily use but for a specific task, capable of running on very, very little amount of memory, and sustaining itself with little to no modules up at all.
 
+CAUSE; design heavy
 
     Most modern modular OS devs are afraid to let the user hit base case. They're afraid of nuking a leg. Even linux won't let you turn off certain modules, because some subsystems depend on them. I want every single module to be able to running independently, including subsystems, without hitting cases like "can't be turned off because someone else is using me!".
     The final goal is to sacrifice uneeded functionality to an extreme. For example, you load my OS, tweak it to your liking - removing the UI, the I/O drivers, the wifi-driver, the file system, and finally, the memory manager. You don't need this. You've decided you're only keeping the clock driver, which will output to somewhere (I told you, everything's self-sustainable. If it doesn't have a terminal or UI, it's going to output to a PORT. Or have the kernel buffer save it.
