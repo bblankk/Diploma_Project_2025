@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "terminal.h"
 #include "multiboot.h"
+#include "../include/pmm.h"
 
 const char* mem_Type_Name(uint32_t type) {
     switch (type) {
@@ -12,6 +13,9 @@ const char* mem_Type_Name(uint32_t type) {
         default: return "Unknown";
     }
 }
+
+
+memap_Region regions[32];
 
 void print_Memory_Map(multibootInfo_t* mbInfo) {
     if (!(mbInfo->flags & (1 << 6))) {
@@ -35,9 +39,29 @@ void print_Memory_Map(multibootInfo_t* mbInfo) {
         terminal_Write(mem_Type_Name(entry->type));
         terminal_Write("\n");
 
+        regions[offset].base = entry->addr;
+        regions[offset].length = entry->len;
+        regions[offset].type = entry->type;
+
         offset += entry->size + sizeof(entry->size);
     }
 
     terminal_Write("=======================================\n");
+
+    terminal_Write("Total regions parsed: ");
+    terminal_PrintHex64(mmapLength / (sizeof(multibootMmapEntry_t) + 4));
+    terminal_Write("\n");
+
+    for (uint32_t i = 0; i < mmapLength / (sizeof(multibootMmapEntry_t) + 4); i++) {
+        terminal_Write("Region ");
+        terminal_PrintHex64(i);
+        terminal_Write(": Base=0x");
+        terminal_PrintHex64(regions[i].base);
+        terminal_Write(", Length=0x");
+        terminal_PrintHex64(regions[i].length);
+        terminal_Write(", Type=");
+        terminal_Write(mem_Type_Name(regions[i].type));
+        terminal_Write("\n");
+    }
 }
 

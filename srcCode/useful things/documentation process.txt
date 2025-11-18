@@ -329,3 +329,31 @@ Try to allocate from G-pool and attempt to create a physically contiguous chunk 
 
 Signal user that host lacks contiguous memory.
 //
+
+
+nov 17 
+everything that talks about pages (page tables, TLB, alignment) expects 4 KiB pages. I'm thinking of playing with that - bigger/smaller pages? Can they be effectively utilized? Well, we'll see later, as a bunch of 3rd party young ladies are expecting 4kb -sized pieces of meat from me.
+I really hate constraints.
+The MMU works in 4 KiB units by default; you must align reserves/allocations to that.
+Now then, what is the mmu? The MMU is a hardware component inside the CPU that: 
+-Translates virtual addresses → physical addresses
+-Enforces protection (kernel vs user)
+-Uses page tables the OS builds
+-Works in page-sized chunks
+On x86 (real mode excluded), the MMU requires 4 KiB pages as the basic unit when paging is enabled.
+
+"The Excel-spreadsheet analogy
+Each row in the spreadsheet = one 4 KiB physical page
+Row 0 → page at physical address 0x00000000
+Row 1 → next page (0x00001000)
+Row 2 → next page (0x00002000)
+
+Every physical page is one row.
+The CPU can only work row-by-row, not by arbitrary byte ranges."
+
+The memory map from your bootloader is like a color legend.
+It tells you:
+Rows 0–159 = reserved
+Rows 160–10239 = usable
+Rows 10240–10255 = ACPI data
+Rows 10256–... = don’t touch

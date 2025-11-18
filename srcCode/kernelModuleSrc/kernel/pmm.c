@@ -2,6 +2,18 @@
 #include <stddef.h>
 #include <stdint.h>
 
+//everything that talks about pages (page tables, TLB, alignment) expects 4 KiB pages. I'm thinking of playing with that - bigger/smaller pages? Can they be effectively utilized? Well, we'll see later, as a bunch of 3rd party young ladies are expecting 4kb meat rn.
+
+
+
+
+
+
+
+
+
+
+
 //define rom (read only memory) and dont touch it
 // read only memory is a small block of code on the motherboard in some chip you might recognize as the BIOS chip, and it's commonly known for storing BIOS and other untouchable firmware. What's on there is decided by the manufacturer and NONE of our business, we won't be touching it.
 
