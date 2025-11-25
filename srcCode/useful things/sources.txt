@@ -12,6 +12,11 @@ https://wiki.ubuntu.com/Kernel/SourceCode  //ubuntu kernel source code
 for raspberry:
 https://www.raspberrypi.com/documentation/computers/configuration.html  //the raspberry manual
 
+library C:
+https://pubs.opengroup.org/onlinepubs/007904975/basedefs/stdint.h.html
+
+assembly:
+https://www.cs.virginia.edu/~evans/cs216/guides/x86.html
 
 here's what i used:
 geany (text editor but for assembly)

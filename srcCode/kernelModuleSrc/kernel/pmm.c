@@ -1,17 +1,22 @@
 //PHYSICAL MEMORY ALLOCATOR, ALSO CALLED PMM (PHYSICAL MEMORY MANAGER) - MAIN FUNCTIONALITY LIVES HERE <22
+
 #include <stddef.h>
 #include <stdint.h>
+//#include "../include/pmm.h"
+#include "../include/memap.h"
+#include "../include/pmm.h"
 
 //everything that talks about pages (page tables, TLB, alignment) expects 4 KiB pages. I'm thinking of playing with that - bigger/smaller pages? Can they be effectively utilized? Well, we'll see later, as a bunch of 3rd party young ladies are expecting 4kb meat rn.
 
+// first: parse memap sections and mark down usable RAM
 
+//second: a small contiguous pool tracked by a bitmap
+//these will be used for the bitmap
 
-
-
-
-
-
-
+void one() {
+    // Accessing the first region's base address
+    uint64_t base = regions[0].base;
+}
 
 
 //define rom (read only memory) and dont touch it
@@ -24,8 +29,3 @@
 //dynamically allocated memory - hardest part here, beware memory holes and implement all the thread management stuff C will need later on.
 
 // side quest - garbage collector  ( GC strat )
-
-//
-void initialize_Physical_Memory_Allocator(uint32_t totalMemorySize, uint32_t kernelEndAddress);
-void* allocate_Physical_Memory(size_t size);
-void free_Physical_Memory(void* address, size_t size);
