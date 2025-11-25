@@ -207,12 +207,153 @@ linking em:
 ld -m elf_i386 -T linker.ld -o kernel.elf multiBootHeader.o kernel.o
 qemu:
 qemu-system-i386 -kernel kernel.elf
-
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 or use the makefile (from kernel folder):
 make // everything goes in build folder
 make run //runs the elf in there
 make clean //removes build folder
 
+oct21
+uh, multiboot time. aka memory map time. aka into the unknown territory.
+Okay, apparently there's 2 multiboot headers: multiboot1 (older, and widely supported, and easier on the tutorials) and multiboot2 (newer, "more flexible" , gives more information, still supported by qemu and grub, but apparently a bit harder to start on).
+It'll be harder to swtich later so we're making decisions now - and im deciding on multiboot1 , which is just FINE for a hobby OS (we aren't striving for perfection). What's worrying me is that multiboot2 is "future proof" and multiboot1 may not be supported later... but ain't that a problem for future me? haha
+So, now that we have decided on multiboot1 we're going to get the memory map in kmain.
+
+oct27
+Memory map down. It's currently being outputted to the screen. All functions are in a memap.c file. oh in the multibootheader.asm , the ebx register gets pushed (passed) to kmain, because this is where GRUB stores the memory map pointer. There are two structures that get some data passed to them ... aghh...
+I also changed all the functions to follow the case conventions - functions with camel snake case, and variables with camel case. I felt it to be prettier.
+The terminal is now pink. ( took exactly one change)
+erm... im pretty happy with the memory map, so i'm going to be working more on the terminal functionality. First things first , I/O. Which means keyboard driver. Which means starting on the external drivers. Which opens another can of worms i was avoiding till now. The PIC (Programmable Interrupt Controler), hardware interrupts, and ports. Time to worry about the 0x60 port, "the data port", scancodes, and how to integrate all of that into code. (not excited about this part)
+funsies are officially finished, time for bios interrupts (sad).
+A few things to do:
+    - inter -process communication
+    - a way for programs to allcocate and free data 
+
+Forget it , we're not working on the terminal, first we need to set up some more memory stuff (agh, i hate memory stuff, agh, why is this the main focus of my project? i just don't understand it, i guess, and it's hard to debug - what am i even looking at ?!)
 
 
+oct 28th
+We need to implement physical memory, virtual memory, and  a way for programs to allocate it at all... aghh.... TT. why, god , why?? (what have i gotten myself into, pt1).
+- Four general models of memory usage in most programs, including operating systems: read-only memory, static global memory, lexically allocated memory, and dynamically allocated memory. 
+okay  , buddy , let's get to the physical memory before the virtual memory. Let's implement it... let's do it .. !!
 
+
+nov 10th
+i took a lil break, sue me. what was i doin before? i seem to be lacking a keyboard driver, but if memory recalls, i had memory issues too..? er
+i configured hithub copilot. if theres weird stuff i blame it. (i am aware that machines cannot take responsibility)
+
+"i wanted to make a physical memory allocator. i was wondering if i should make it in kernel or memap.c? the memap was just for the memory map so i wanted to leave it alone and clean, but i dont know if ti would be better to be there? or should i make its own file for physical memory allocation and call the functions in kernel? somehow that seems to be the best solution, doesn't it? well you give me advice. first we need to set up paging - since my kernel already knows all usable ram ranges (memap functions ) we need to put those ranges into fixed-size pages and make a bitman for those pages. im thinking 4kb pages" - im loosing my mind
+
+
+nov 11th
+I'm not really sure if I'm ready to go back to basics, but did you know that ROM is about 12mbs and only stores vital information to start the system, like the firmware, the BIOS UEFI. It's what the CPU runs first on power on. And it's pre-programmed by the person who made the device, because it's a non-programmable chip on the motherboard.
+In summary, ROM is just another way to call the BIOS chip on the motherboard. It's also called an SPI chip.
+It contains:
+Power-on initialization code
+Hardware configuration tables
+Boot device selection logic
+Option ROMs for device
+The firmware setup UI
+
+and is NOT re-programmable. I mean, it is, but there is no reason for me to tinker 'round there right now. Although I want to. I'm a bit curious. But we've got bigger problems right now!!!
+
+//The PC does have writable memory (RAM) — temporary.
+Persistent storage (SSD/HDD) is separate hardware accessed through drivers and filesystems.
+The kernel manages RAM directly and storage indirectly.
+ROM is just firmware, not general storage or memory.//
+
+so , about volatile/permanent memory. RAM's our bestie right now , but let's forget about permanent storage for the time being. let's focus on configuring our RAM allocator.
+- THE PHYSICAL MEMORY ALLOCATOR IS ONLY  A RAM ALLOCATOR, PERMANENNT MEMORY IS ON "EXTERNAL" DEVICES AND ISN'T MANAGED BY THE CPU
+
+conclusion: ABOUT RAM
+🍓 highest-level allocators: kernel heap alloc/user-space memory management management
+🍓 on top is the virtual memory layer - Maps virtual addresses to physical pages using the page tables, handles process isolation, when it needs a new page, calls the phys mem allocator
+🍓 on bot is physical memory allocator - paging, RAM pages, tracks which are free/used , provides pages to sybsystems 
+
+Now that we know a bit more, we can start writing code! I'm thinking of making the physical pages first, and track them, today. The question of whether they should be in the kernel or not remains, but I recon everything memory-management related should be. Well, nevertheless, I'm shoving them in a new file to keep my kernel "clean". Just remember to put an important star on it.
+
+Back to learning, now about paging. There's contiguous and scrambled pages. A small amount of devices expect and absolutely need a continious page alignment. Others request normal pages (which can be anywhere). What we're gonna do is split it into two:
+- a small ("edicated contiguous pool tracked by a bitmap") BITMAP in front that's continuous. This pool services DMA/firmware/driver requests that require physically contiguous pages.
+
+- a longer ("buddy allocator for the general pool") BUDDY SYSTEM in the back that's scrambled - page order doesn't matter
+ofc the virtual allocator won't be helpoing those devices get memory, but the kernel, so it's not going to touch the first BITMAP at all.
+Physical: [A][B][C][D] + [E][H][J][K][F][G][I][L]  (C-pool + G-pool)(continuous and general)
+Virtual : [H][E][K][I][J][L][G][F]
+Contiguous use → [A–D]
+
+
+TODO:
+
+Parse firmware memory map. Mark usable ranges.
+
+Pick contiguous region(s) for C-pool. Prefer low-high contiguous ranges reported usable. Carve them out and mark as C-pool.
+
+Initialize C-pool bitmap over that region.
+
+Initialize G-pool buddy allocator over remaining usable pages.
+
+Mark both pools in the global page bookkeeping so nothing else grabs those pages.
+
+//
+Bitmap for C-pool (practical)
+
+Use uint64_t words. 1 = used, 0 = free.
+
+Fast ops: ~word, __builtin_ctzll, __builtin_popcountll.
+
+Provide find_run(npages) that scans words, uses ctz on word-by-word runs to find a contiguous run of npages.
+
+Keep a hint cursor to avoid scanning from 0 each time.
+
+Lock per-pool for SMP (spinlock).
+//
+Buddy for G-pool (practical)
+
+Orders from order_min = 0 (1 page) to order_max (largest power-of-two block).
+
+Free-lists per order. On alloc, find smallest order >= npages. If not available, split larger block down. On free, try to merge with buddy.
+
+Maintain a small secondary bitmap if you want quick emptiness checks per order (optional).
+
+Lock per-order or per-region for concurrency.
+//
+Interaction between pools
+
+Keep separate metadata. The global physical bitmap can mirror both pools for debugging/inspection, but operations should be local for speed.
+
+If C-pool exhausted, choose policy:
+
+Fail allocation and return NULL.
+
+Try to allocate from G-pool and attempt to create a physically contiguous chunk by compaction (expensive) — avoid this in early kernel.
+
+Signal user that host lacks contiguous memory.
+//
+
+
+nov 17 
+everything that talks about pages (page tables, TLB, alignment) expects 4 KiB pages. I'm thinking of playing with that - bigger/smaller pages? Can they be effectively utilized? Well, we'll see later, as a bunch of 3rd party young ladies are expecting 4kb -sized pieces of meat from me.
+I really hate constraints.
+The MMU works in 4 KiB units by default; you must align reserves/allocations to that.
+Now then, what is the mmu? The MMU is a hardware component inside the CPU that: 
+-Translates virtual addresses → physical addresses
+-Enforces protection (kernel vs user)
+-Uses page tables the OS builds
+-Works in page-sized chunks
+On x86 (real mode excluded), the MMU requires 4 KiB pages as the basic unit when paging is enabled.
+
+"The Excel-spreadsheet analogy
+Each row in the spreadsheet = one 4 KiB physical page
+Row 0 → page at physical address 0x00000000
+Row 1 → next page (0x00001000)
+Row 2 → next page (0x00002000)
+
+Every physical page is one row.
+The CPU can only work row-by-row, not by arbitrary byte ranges."
+
+The memory map from your bootloader is like a color legend.
+It tells you:
+Rows 0–159 = reserved
+Rows 160–10239 = usable
+Rows 10240–10255 = ACPI data
+Rows 10256–... = don’t touch

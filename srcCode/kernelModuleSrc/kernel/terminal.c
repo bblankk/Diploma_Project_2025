@@ -1,29 +1,19 @@
-// we're currently in protected real mode 32bit
-//full access to address space :3
-// apparently a stack pointer has been helpfully set by GRUB already. You can use stack - related C functions.
-//currently in a nakey environment - just cpu , no libc, no bios calls.
-
+//HERE LIVE THE TERMINAL FUNCTIONALITY
 
 #include <stddef.h>
-#include <stdint.h> // implements fixed-width integer types int8_t, uint16_t, int32_t, and uint64_t (among others). 
+#include <stdint.h>
+#include "terminal.h"
+#include "keyboard.h"
 
-//uint8_t - unsigned int 8 bit 
-#define MULTIBOOT_HEADER_MAGIC    0x1BADB002
-#define MULTIBOOT_HEADER_FLAGS    0x00010003
-#define MULTIBOOT_HEADER_CHECKSUM -(MULTIBOOT_HEADER_MAGIC + MULTIBOOT_HEADER_FLAGS)
-
-__attribute__((section(".multiboot"))) const uint32_t multiboot_header[] = {
-    MULTIBOOT_HEADER_MAGIC,
-    MULTIBOOT_HEADER_FLAGS,
-    MULTIBOOT_HEADER_CHECKSUM
-};
-// DONT REMOVE THIS ITS THE MULTIBOOT MAGIC !!
-
+// # - library, be careful with which ones work. no C libraries only definitions
+// "" - this is MY OWN header, that i made . compiled with your kernel.
+//GLOBALS
 #define VGA_WIDTH 80  
 #define VGA_HEIGHT 25
 #define VGA_ADDRESS 0xB8000  //starting ADDRESS of the terminal frame buffer
-   
 
+
+// VGA/TERMINAL STUFF
 static uint16_t* const VGA_BUFFER = (uint16_t*)VGA_ADDRESS;  //each address has color and value -2 bytes = 16bits , const = we're not changing where it's pointing, it'll always point to 0xB8000, static = file-scoped, only available in this file.
 //this is the buffer pointer.
 //VGA_BUFFER[index] = something; writes directly to video memory
@@ -47,10 +37,10 @@ static inline uint16_t vga_entry(unsigned char uc, uint8_t color) {
 }
 
 
-void terminal_initialize(void) {
+void terminal_Initialize(void) {
     terminal_row = 0;
     terminal_column = 0;
-    terminal_color = vga_entry_color(7, 0); // initial terminal color, grey on black
+    terminal_color = vga_entry_color(13, 15); // initial terminal color, pink text on white bg
     for (size_t y = 0; y < VGA_HEIGHT; y++) {
         for (size_t x = 0; x < VGA_WIDTH; x++) {
             const size_t index = y * VGA_WIDTH + x;
@@ -61,7 +51,7 @@ void terminal_initialize(void) {
 //This sets your cursor to (0, 0), picks a color, and fills the entire screen with spaces.
 //It’s writing ' ' and 0x07 into every cell of that 0xB8000 buffer.aka initialization of the terminal
 
-void terminal_printchar(char c) {  //used to be terminalputchar
+void terminal_Printchar(char c) {  //used to be terminalputchar
     if (c == '\n') {
         terminal_row++;
         terminal_column = 0;   // is it a new line? no? skip
@@ -83,22 +73,51 @@ void terminal_printchar(char c) {  //used to be terminalputchar
 }
 //printing CHARACTERS
 
-void terminal_write(const char* data) {
+void terminal_Write(const char* data) {
     for (size_t i = 0; data[i] != '\0'; i++)
-        terminal_printchar(data[i]);
+        terminal_Printchar(data[i]);
 }
 //loops through each byte until \0 (end of string) and prints it.
 
+void terminal_PrintHex32(uint32_t num) {
+    const char* hexChars = "0123456789ABCDEF";
+    char buf[9];
+    buf[8] = '\0';
+    for (int i = 7; i >= 0; i--) {
+        buf[i] = hexChars[num & 0xF];
+        num >>= 4;
+    }
+    terminal_Write(buf);
+} // printing hex32
+
+void terminal_PrintHex64(uint64_t num) {
+    terminal_PrintHex32((uint32_t)(num >> 32));
+    terminal_PrintHex32((uint32_t)(num & 0xFFFFFFFF));
+} //printing hex64
 
 
-//main 
-void kmain(void) {
 
 
-    terminal_initialize();
-    terminal_write("Hello, world from kernel!\n");
-    terminal_write("This is a new line!\n");
-    terminal_write("Nice, right?");
-    for (;;) {}
-}
+
+
+
+// VGA COLORS
+//| Number | Color name                     |
+//| ------ | ------------------------------ |
+//| 0      | black                          |
+//| 1      | blue                           |
+//| 2      | green                          |
+//| 3      | cyan                           |
+//| 4      | red                            |
+//| 5      | magenta                        |
+//| 6      | brown                          |
+//| 7      | light gray                     |
+//| 8      | dark gray                      |
+//| 9      | light blue                     |
+//| 10     | light green                    |
+//| 11     | light cyan                     |
+//| 12     | light red                      |
+//| 13     | light magenta
+//| 14     | yellow                         |
+//| 15     | white                          |
 
