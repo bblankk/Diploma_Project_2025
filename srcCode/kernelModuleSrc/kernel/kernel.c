@@ -8,8 +8,8 @@
 #include <stdint.h> // implements fixed-width integer types int8_t, uint16_t, int32_t, and uint64_t (among others). 
  #include "terminal.h"  // "hey, my terminal functions are here!"
 #include "multiboot.h"  //later defined - multiboot protocol. needed for mem. map
-#include "memap.h" //memory map stuff
-
+#include "memap.h" // memory map stuff
+#include "pmm.h"
 
 
 //main 
@@ -18,12 +18,14 @@ void kmain(multibootInfo_t* mbInfo) {
 
 
     terminal_Initialize();
-    terminal_Write("Hello, world from kernel!\n");
-    terminal_Write("This is a new line!\n");
-    terminal_Write("Nice, right?\n \n");
+    terminal_Write("Terminal initialized\n");
 
-    // Print memory map passed by GRUB
-    print_Memory_Map(mbInfo) ;
+    //initializing pmm and vmm's initial memory readings
+    memap_Region regions[32];
+    size_t region_count;
+    region_count = memap_parse(mbInfo, regions, 32);
+    pmm_init(regions, region_count);
+    //vmm_init(regions, region_count);
 
 
     for (;;) {}

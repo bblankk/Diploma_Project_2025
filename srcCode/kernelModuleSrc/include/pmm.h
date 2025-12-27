@@ -5,13 +5,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-typedef struct
-{
-    uint64_t base; //physical starting address of this region (LOWEST physical address of the region)
-    uint64_t length; // how long the region is (in bytes)
-    uint32_t type;   // 1 = usable, others = reserved
-} memap_Region;
-
 
 
 

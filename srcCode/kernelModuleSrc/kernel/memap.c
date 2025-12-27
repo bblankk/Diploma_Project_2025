@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include "terminal.h"
 #include "multiboot.h"
-#include "../include/pmm.h"
+#include "../include/memap.h"
 
 const char* mem_Type_Name(uint32_t type) {
     switch (type) {
@@ -15,53 +15,29 @@ const char* mem_Type_Name(uint32_t type) {
 }
 
 
-memap_Region regions[32];
-
-void print_Memory_Map(multibootInfo_t* mbInfo) {
+//memap_Region regions[32];
+//this is some kind of initializing function actually
+void print_Memory_Map(multibootInfo_t* mbInfo, memap_Region regions[],  size_t max_regions) {
+    //if no regions
     if (!(mbInfo->flags & (1 << 6))) {
-        terminal_Write("No memory map provided by GRUB.\n");
-        return;
+       return 0;
     }
-
-    terminal_Write("=== Physical Memory Map (from GRUB) ===\n");
 
     uint32_t mmapAddr   = mbInfo->mmapAddr;
     uint32_t mmapLength = mbInfo->mmapLength;
 
-    for (uint32_t offset = 0; offset < mmapLength; ) {
+    size_t regionCount = 0;
+    for (uint32_t offset = 0; offset < mmapLength  && regionCount < max_regions;   ) {
         multibootMmapEntry_t* entry = (multibootMmapEntry_t*)(mmapAddr + offset);
+        
+        regions[regionCount].base = entry->addr; 
+        regions[regionCount].length = entry->len;
+        regions[regionCount].type = entry->type;
 
-        terminal_Write("Base: 0x");
-        terminal_PrintHex64(entry->addr);
-        terminal_Write(" | Length: 0x");
-        terminal_PrintHex64(entry->len);
-        terminal_Write(" | Type: ");
-        terminal_Write(mem_Type_Name(entry->type));
-        terminal_Write("\n");
-
-        regions[offset].base = entry->addr;
-        regions[offset].length = entry->len;
-        regions[offset].type = entry->type;
-
-        offset += entry->size + sizeof(entry->size);
+        regionCount++;
+        offset += entry->size + sizeof(entry->size); 
     }
-
-    terminal_Write("=======================================\n");
-
-    terminal_Write("Total regions parsed: ");
-    terminal_PrintHex64(mmapLength / (sizeof(multibootMmapEntry_t) + 4));
-    terminal_Write("\n");
-
-    for (uint32_t i = 0; i < mmapLength / (sizeof(multibootMmapEntry_t) + 4); i++) {
-        terminal_Write("Region ");
-        terminal_PrintHex64(i);
-        terminal_Write(": Base=0x");
-        terminal_PrintHex64(regions[i].base);
-        terminal_Write(", Length=0x");
-        terminal_PrintHex64(regions[i].length);
-        terminal_Write(", Type=");
-        terminal_Write(mem_Type_Name(regions[i].type));
-        terminal_Write("\n");
-    }
+    return regionCount;
+    
 }
 
