@@ -1,2 +1,2 @@
 # proektna-praktika-2025
-here we go 
+Latest branch is main!
