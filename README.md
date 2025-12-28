@@ -1,2 +1,2 @@
-# proektna-praktika-2025
+# OSDev project for dummies
 Latest branch is main!
