@@ -20,11 +20,14 @@ void kmain(multibootInfo_t* mbInfo) {
     terminal_Initialize();
     terminal_Write("Terminal initialized\n");
 
+
     //initializing pmm and vmm's initial memory readings
-    memap_Region regions[32];
-    size_t region_count;
-    region_count = memap_parse(mbInfo, regions, 32);
-    pmm_init(regions, region_count);
+    memap_Region regions[32]; ////parse, normalize, consume 
+    int32_t region_count; // the amount of available and normalized regions, ready to be used
+    region_count = parse_Map(mbInfo, regions, 32); //parse + fill regions[32]. Returns the amount of normalized type1 regions parsed.
+    region_count = memap_Normalize(mbInfo, regions, 32); // page-align region base and end address
+
+    pmm_Init(regions, region_count); // consume
     //vmm_init(regions, region_count);
 
 

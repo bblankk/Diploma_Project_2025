@@ -6,18 +6,9 @@
 #include <stdint.h>
 
 
+// we need : initialize map, allocate, free;
+// later: functions that work with vmm
+void pmm_Init(); // update with parameters when finished
 
-
-
-
-
-
-
-
-
-//frankly we do NOT have the functions below yet, i'm just feeling out what i'm gonna do
-//void initialize_Physical_Memory_Allocator(uint32_t totalMemorySize, uint32_t kernelEndAddress);
-//void* allocate_Physical_Memory(size_t size);
-//void free_Physical_Memory(void* address, size_t size);
 #endif 
 

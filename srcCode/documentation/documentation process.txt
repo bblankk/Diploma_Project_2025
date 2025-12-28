@@ -357,3 +357,9 @@ Rows 0–159 = reserved
 Rows 160–10239 = usable
 Rows 10240–10255 = ACPI data
 Rows 10256–... = don’t touch
+
+28/12 
+uint32_t for counts, indexes, region counts
+uint64_t for physical addresses and lengths
+DONT use size_t , it's architecture dependent. 
+WE FINALLY SOLVED THE PUZZLE!! 3 files can't know about each other, but have to share information - one of which has to parse/make this information, and the other two consume it. Puzzle of the f/king century, as it turns out, my dumbass has a whole KERNEL to do it for me. ugh. this alone took me a month to figure out.

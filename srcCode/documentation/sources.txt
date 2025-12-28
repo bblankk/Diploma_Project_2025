@@ -14,6 +14,7 @@ https://www.raspberrypi.com/documentation/computers/configuration.html  //the ra
 
 library C:
 https://pubs.opengroup.org/onlinepubs/007904975/basedefs/stdint.h.html
+https://www.thejat.in/learn/size-t-in-stdint
 
 assembly:
 https://www.cs.virginia.edu/~evans/cs216/guides/x86.html

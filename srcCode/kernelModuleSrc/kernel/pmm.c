@@ -13,9 +13,8 @@
 //second: a small contiguous pool tracked by a bitmap
 //these will be used for the bitmap
 
-void one() {
-    // Accessing the first region's base address
-    uint64_t base = regions[0].base;
+void pmm_Init() {
+    
 }
 
 
