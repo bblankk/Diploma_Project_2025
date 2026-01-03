@@ -16,8 +16,8 @@
 // walk usable regions to check if everythin workin ??
 // functions for allocating / deallocating  pages
 
-void pmm_Init(memap_Region regions[], int32_t regionCount ) {
-  
+void pmm_Init(memap_Region regions[], int32_t regionCount, uint64_t bitmapPhysicalBase ) {
+    
 
 }
 
