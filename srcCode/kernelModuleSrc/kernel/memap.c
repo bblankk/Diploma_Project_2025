@@ -36,9 +36,9 @@ int32_t parse_Map(multibootInfo_t* mbInfo, memap_Region regions[],  int32_t max_
 
 
 // page-aligns the base and end address of all regions in the regions[] array. Returns the amount of page-aligned type1 regions in total.
-size_t memap_Normalize( multibootInfo_t* mbInfo, memap_Region regions[], int32_t max_regions) 
+int32_t memap_Normalize( multibootInfo_t* mbInfo, memap_Region regions[], int32_t max_regions) 
 {
-    size_t count = 0; //how many usable, normalized regions we've got ready to go!
+    int32_t count = 0; //how many usable, normalized regions we've got ready to go!
     uint32_t offset = 0;
     uint64_t alignedBase = 0;
     uint64_t alignedEnd = 0;

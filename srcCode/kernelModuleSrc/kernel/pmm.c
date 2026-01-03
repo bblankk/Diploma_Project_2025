@@ -6,15 +6,19 @@
 #include "../include/memap.h"
 #include "../include/pmm.h"
 
-//everything that talks about pages (page tables, TLB, alignment) expects 4 KiB pages. I'm thinking of playing with that - bigger/smaller pages? Can they be effectively utilized? Well, we'll see later, as a bunch of 3rd party young ladies are expecting 4kb meat rn.
-
-// first: parse memap sections and mark down usable RAM
-
 //second: a small contiguous pool tracked by a bitmap
 //these will be used for the bitmap
 
-void pmm_Init() {
-    
+//bitmap steps; decide the physical address range - lowest to highest for all regions
+// compute total page count for every region
+// allocate bitmap storage
+// initialize all bits 
+// walk usable regions to check if everythin workin ??
+// functions for allocating / deallocating  pages
+
+void pmm_Init(memap_Region regions[], int32_t regionCount ) {
+  
+
 }
 
 

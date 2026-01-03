@@ -363,3 +363,16 @@ uint32_t for counts, indexes, region counts
 uint64_t for physical addresses and lengths
 DONT use size_t , it's architecture dependent. 
 WE FINALLY SOLVED THE PUZZLE!! 3 files can't know about each other, but have to share information - one of which has to parse/make this information, and the other two consume it. Puzzle of the f/king century, as it turns out, my dumbass has a whole KERNEL to do it for me. ugh. this alone took me a month to figure out.
+
+29/12 
+for pmm to work it needs a bitmap to allocate/deallocate phys memory to.
+for the bitmap to exist, it needs to be allocated somewhere in the memory pmm has no access to, so pmm doesn't accidentally castrate it's own bookeeping by overwriting the memory where the bitmap lives.
+Safest bet is to make a bitmap at the end of the kernel's space, which is before pmm even exists.
+This of course needs to be done by the kernel. 
+But to do that, we need to know what address the kernel ends at dynamically ( we are NOT calculating ts).
+In the linker script (am i the only one who forgot the kernel had its own special linker? yes?) i made a variable that saves the end address of the kernel (where it ends.. yeah ... idk how to say it)
+and then we're using it in kernel.c as an 'extern' uint8_t ( okay so.. linker related address shenanighans should be the smallest possible, don't ask)
+In conclusion, we now have some space reserved for a bitmap, which will later be used. That being said... where do the rest of these mfs load in? pmm.c, memap.c and even terminal.c, where do they live? I really need to read the GRUB documentation before i get nuked by it, but really, I don't want to..!! We ball until it becomes a problem.
+
+30/12
+spoiler alert: it became a problem. Guess what lives at kernel's end? yeah . the rest of ma damn files. Ugh... time to relocate that poor lil map.
