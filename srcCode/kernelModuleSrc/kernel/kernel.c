@@ -11,6 +11,11 @@
 #include "memap.h" // memory map stuff
 #include "pmm.h"
 
+
+// Note that linker symbols are not variables, they have no memory allocated for maintaining a value, rather their address is their value.
+extern uint8_t kernelEnd; // from linker.ld , this is a pointer to the ADDRESS Of the end of the kernel
+
+
 //kmain expects the ebx pointer (for the memory map) to be first argument on the stack. (pushed last)
 void kmain(multibootInfo_t* mbInfo) {
 
@@ -29,8 +34,8 @@ void kmain(multibootInfo_t* mbInfo) {
 
 
 
-    extern uint8_t kernelEnd; // from linker.ld , this is a pointer to the ADDRESS Of the end of the kernel
-    uint64_t bitmapPhysicalBase = (uint64_t)&kernelEnd; // now this is the numerical value for the physical address where pmm's bitmap will live
+    
+    uint64_t bitmapPhysicalBaseAddress = (uint64_t)&kernelEnd; // now this is the numerical value for the physical address where pmm's bitmap will live
    
 
     for (;;) {}

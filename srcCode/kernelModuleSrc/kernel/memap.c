@@ -6,7 +6,7 @@
 
 
 
-#define PAGE_SIZE 4096 // assumed bytes per page table
+#define PAGE_SIZE 4096 // bytes per page table
 
 // parses memory map and fills regions array (used for vmm/pmm)
 int32_t parse_Map(multibootInfo_t* mbInfo, memap_Region regions[],  int32_t max_regions) 
