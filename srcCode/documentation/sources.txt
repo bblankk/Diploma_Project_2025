@@ -8,6 +8,8 @@ https://flatassembler.net/examples.php, https://mh-nexus.de/en/hxd/
 https://wiki.osdev.org/Bare_Bones#Booting_the_Operating_System  //basic OS tutorial
 https://www.kernel.org/doc/html/v4.14/process/howto.html  //kernel dev
 https://wiki.ubuntu.com/Kernel/SourceCode  //ubuntu kernel source code
+http://www.osdever.net/bkerndev/Docs/title.htm
+https://github.com/szhou42/osdev
 
 for raspberry:
 https://www.raspberrypi.com/documentation/computers/configuration.html  //the raspberry manual
