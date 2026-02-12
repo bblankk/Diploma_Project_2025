@@ -376,3 +376,10 @@ In conclusion, we now have some space reserved for a bitmap, which will later be
 
 30/12
 spoiler alert: it became a problem. Guess what lives at kernel's end? yeah . the rest of ma damn files. Ugh... time to relocate that poor lil map.
+
+12/02 
+Idea has changed from aimless OSdev project slightly. 
+We're going to use two different concepts and see how compatible they are with working together .
+A FAST but 0 security approach: letting programs decide how and how much memory they're going to use.
+Security approach: giving each process a key . 
+smush em. ! mush em !!!
