@@ -14,27 +14,43 @@ Bitmap (1 byte = 8 bits):
 
 */
 
+#include <stdint.h>
+#include "../include/bitmap.h"
 
 // !! ------------------ FUNCTIONS FOR INITIALIZATION AND INITIAL CLEARS. used by kernel.
 
-#define PAGE_SIZE 4096 // a real memory page is 4kb, 4096 bytes.
-static uint64_t pmm_total_pages; // this will be used internally.
 
+#define PAGE_SIZE 4096 // a real memory page is 4kb, 4096 bytes.
+static uint64_t pmmTotalPages = 0; // this will be used internally.
+static uint8_t* bitmap = 0;
+
+static uint64_t physBase = 0;
+static uint64_t physTop  = 0;
 
 /* this function calculates the total pages of the final bitmap
  param regions is a pointer to the start of the regions array
  param regionCount is an unsigned integer for the total amount of expected safe-to-use regions */
-uint64_t count_Pages(memap_Region regions[], uint32_t regionCount)
+static void compute_PhysBounds(memap_Region regions[], uint32_t count)
 {
-    uint64_t pages = 0;
+    physBase = (uint64_t)-1;
+    physTop  = 0;
 
-    for (uint32_t i = 0; i < regionCount; i++)
+    for (uint32_t i = 0; i < count; i++)
     {
-        pages += regions[i].length / 4096; //bites of the region divided by bites of a page = pages per region
+        if (regions[i].base < physBase)
+            physBase = regions[i].base;
+
+        uint64_t end = regions[i].base + regions[i].length;
+        if (end > physTop)
+            physTop = end;
     }
 
-    return pages;
+    physBase &= ~(PAGE_SIZE - 1);
+    physTop   = (physTop + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
+
+    pmmTotalPages = (physTop - physBase) / PAGE_SIZE;
 }
+
 
 
 
@@ -42,37 +58,35 @@ uint64_t count_Pages(memap_Region regions[], uint32_t regionCount)
 //this function initiates the bitmap with the total amount of pages and marks all pages as used (1) to be later marked as free (0) when they are found in the safe-to-use regions. Used in initialization on startup.
 void bitmap_Init(memap_Region regions[], uint32_t regionCount, uint64_t bitmapBase)
 {
-    pmm_total_pages = pmm_CountPages(regions, regionCount);
+    compute_PhysBounds(regions, regionCount);
 
-    uint64_t bitmapBytes = (pmm_total_pages + 7) / 8; //converts bits to bytes using some math ceil shenanighans. Adding 7 ensures that any remaining bits will be added to the final byte measurements.
+    uint64_t bitmapBytes = (pmmTotalPages + 7) / 8;
 
-    bitmap = (uint8_t*)bitmapBase; //what starts at memory address bitmapBase, that's going to be my bitmap array
+    bitmap = (uint8_t*)bitmapBase;
 
-    //mark all pages used (1)
-     for (uint64_t i = 0; i < bitmapBytes; i++)
-    {
-        bitmap[i] = 0xFF; // every bit to 1, all pages start as reserved
-    }
-
-
+    for (uint64_t i = 0; i < bitmapBytes; i++)
+        bitmap[i] = 0xFF;
 }
+
+
+
 
 // frees all usable pages, aka flags them 0 on the internal bookkeeping. This is for initialization on startup.
 void bitmap_InitFreePages(memap_Region regions[], uint32_t regionCount)
 {
     for(uint32_t i =0 ; i< regionCount; i++)
     {
-        if(region.type == 1) // if the region is usable
+        if(regions[i].type == 1) // if the region is usable
         {
             uint64_t start = regions[i].base;
             uint64_t end   = regions[i].base + regions[i].length;
             for (uint64_t addr = start; addr < end; addr += PAGE_SIZE) // loops every real mem page in the region. 
                 {
-                    uint64_t page_index = addr / PAGE_SIZE;
+                    uint64_t page_index = (addr - physBase) / PAGE_SIZE;
                     uint64_t byte = page_index / 8;
                     uint8_t  bit  = page_index % 8;
 
-                    bitmap[byte] &= ~(1 << bit); // more shenanighans. long story short, only the current bit(page flag) gets freed. long story below.
+                    bitmap[byte] &= (uint8_t)~(1u << bit); // more shenanighans. long story short, only the current bit(page flag) gets freed. long story below.
                 }
         }
     }
@@ -93,24 +107,26 @@ AND with bitmap:
 
 
 // !! ------------------------------- FUNCTIONS FOR ALLOCATING/DEALLOCATING/TESTING BITS. Used by PMM & VMM.
-//used later. Static = used only internally in this file, not included in linker. Inline because. the compiler quite literally replaces the name with the code inside where they're called. however, im not 100% sure that my compiler even supports inline functions. bewaaare~
+//used later.
 
-//set bit
-static inline void bitmap_set(uint64_t index)   // mark used
+void bitmap_set(uint64_t index)
 {
-    bitmap[index / 8] |= (1 << (index % 8));
+    bitmap[index / 8] |= (uint8_t)(1u << (index % 8));
 }
 
-//clear bit
-static inline void bitmap_clear(uint64_t index) // mark free
+void bitmap_clear(uint64_t index)
 {
-    bitmap[index / 8] &= ~(1 << (index % 8));
+    bitmap[index / 8] &= (uint8_t)~(1u << (index % 8));
 }
 
-//test bit
-static inline uint8_t bitmap_test(uint64_t index) // 1 = used, 0= free;
+uint8_t bitmap_test(uint64_t index)
 {
-    return bitmap[index / 8] & (1 << (index % 8));
+    return (bitmap[index / 8] >> (index % 8)) & 1u;
 }
 
 
+// optional getter so PMM can know limits
+uint64_t bitmap_total_pages(void)
+{
+    return pmmTotalPages;
+}

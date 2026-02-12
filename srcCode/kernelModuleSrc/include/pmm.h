@@ -8,7 +8,12 @@
 
 // we need : initialize map, allocate, free;
 // later: functions that work with vmm
-void pmm_Init(); // update with parameters when finished
+
+void  pmm_Init(memmap_t* map);
+void* pmm_Alloc_Page(void);
+void  pmm_Free_Page(void* phys);
+size_t pmm_Total_Pages(void);
+
 
 #endif 
 

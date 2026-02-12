@@ -1,0 +1,1 @@
+/*Kernel subsystems (heap, paging setup, drivers) request virtual memory ? VMM maps pages ? VMM asks PMM for backing physical frames ? PMM manipulates the bitmap derived from the memmap. The bitmap and memmap are implementation details hidden inside PMM. */

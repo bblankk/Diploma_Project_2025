@@ -59,7 +59,7 @@ int32_t memap_Normalize( multibootInfo_t* mbInfo, memap_Region regions[], int32_
             alignedBase = base + (PAGE_SIZE - (base % PAGE_SIZE)); //throw away the partial page at the beginning
         }
         else{  //and if it is page-aligned, leave it alone
-            uint64_t alignedBase = base;
+            alignedBase = base;
         }
         alignedEnd = end - (end % PAGE_SIZE); //throw away the partial page at the end
 

@@ -2,9 +2,9 @@
 
 #include <stddef.h>
 #include <stdint.h>
-//#include "../include/pmm.h"
 #include "../include/memap.h"
 #include "../include/pmm.h"
+#include "../include/bitmap.h"
 
 //second: a small contiguous pool tracked by a bitmap
 //these will be used for the bitmap
@@ -16,10 +16,30 @@
 // walk usable regions to check if everythin workin ??
 // functions for allocating / deallocating  pages
 
-void pmm_Init(memap_Region regions[], int32_t regionCount, uint64_t bitmapPhysicalBase ) {
-    
 
+static uint8_t* bitmap;
+static size_t total_pages;
+
+void pmm_Init(memmap_t* map) {
+    total_pages = calculate_pages(map);
+    bitmap = place_bitmap_somewhere_safe(map);
+    bitmap_set_all_used(bitmap, total_pages);
+    mark_usable_regions_free(bitmap, map);
 }
+
+//takes no params
+void* pmm_Alloc_Page(void) { 
+    size_t idx = bitmap_find_free(bitmap, total_pages);
+    if (idx == INVALID) return NULL;
+    bitmap_set(bitmap, idx);
+    return (void*)(idx * PAGE_SIZE);
+}
+
+void pmm_Free_Page(void* phys) {
+    size_t idx = (uintptr_t)phys / PAGE_SIZE;
+    bitmap_clear(bitmap, idx);
+}
+
 
 
 //define rom (read only memory) and dont touch it
