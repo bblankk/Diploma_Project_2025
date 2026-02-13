@@ -2,7 +2,6 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "../include/memap.h"
 #include "../include/pmm.h"
 #include "../include/bitmap.h"
 
@@ -16,29 +15,46 @@
 // walk usable regions to check if everythin workin ??
 // functions for allocating / deallocating  pages
 
+//bitmap isnt here, its in bitmap.c. PMM only manipulates it, but it's here.
+static uint64_t totalPages = 0;
 
-static uint8_t* bitmap;
-static size_t total_pages;
 
-void pmm_Init(memmap_t* map) {
-    total_pages = calculate_pages(map);
-    bitmap = place_bitmap_somewhere_safe(map);
-    bitmap_set_all_used(bitmap, total_pages);
-    mark_usable_regions_free(bitmap, map);
+ /* param regions is a pointer to the start of the regions array
+ param regionCount is an unsigned integer for the total amount of expected safe-to-use regions */
+void pmm_init(memap_Region regions[], int32_t regionCount, uint64_t bitmapBase) {
+    // Compute lowest/highest physical addresses
+    uint64_t physBase = UINT64_MAX;
+    uint64_t physTop = 0;
+    for (int i = 0; i < regionCount; i++) {
+        if (regions[i].base < physBase) physBase = regions[i].base;
+        uint64_t end = regions[i].base + regions[i].length;
+        if (end > physTop) physTop = end;
+    }
+    physBase &= ~(4096-1);
+    physTop   = (physTop + 4095) & ~(4096-1);
+
+    totalPages = (physTop - physBase)/4096;
+
+    bitmap_init(bitmapBase, totalPages);
+    bitmap_init_free_pages(regions, regionCount);
 }
 
-//takes no params
-void* pmm_Alloc_Page(void) { 
-    size_t idx = bitmap_find_free(bitmap, total_pages);
-    if (idx == INVALID) return NULL;
-    bitmap_set(bitmap, idx);
-    return (void*)(idx * PAGE_SIZE);
+void* pmm_alloc_page(void) {
+    for (uint64_t i = 0; i < totalPages; i++) {
+        if (!bitmap_test(i)) {
+            bitmap_set(i);
+            return (void*)(bitmap_phys_base() + i*4096);
+        }
+    }
+    return NULL; // no mooore memoryyy
 }
 
-void pmm_Free_Page(void* phys) {
-    size_t idx = (uintptr_t)phys / PAGE_SIZE;
-    bitmap_clear(bitmap, idx);
+void pmm_free_page(void* phys) {
+    uint64_t idx = ((uint64_t)phys - bitmap_phys_base()) / 4096;
+    bitmap_clear(idx);
 }
+
+uint64_t pmm_total_pages(void) { return totalPages; }
 
 
 

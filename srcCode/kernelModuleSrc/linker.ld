@@ -13,5 +13,5 @@ SECTIONS
     .data : { *(.data*) }
     .bss : { *(.bss*) *(COMMON) }
 
-    kernelEnd = .;
+    kernelEnd = ALIGN(4K);
 }

@@ -1,0 +1,71 @@
+                BOOT (GRUB / Multiboot)
+                         │
+                         ▼
+                    kernel.c
+        ─────────────────────────────────
+        • initializes terminal
+        • parses memory map (memap)
+        • normalizes regions
+        • calls pmm_init(...)
+        • initializes vmm
+        ─────────────────────────────────
+                         │
+                         ▼
+                       memap
+        ─────────────────────────────────
+        • parse_Map()
+        • memap_Normalize()
+        • outputs usable physical regions
+        • DOES NOT allocate memory
+        ─────────────────────────────────
+                         │
+                         ▼
+                        PMM
+        ─────────────────────────────────
+        • computes physBase / physTop
+        • computes total physical pages
+        • builds + owns bitmap storage
+        • alloc/free physical frames
+        • exposes pmm_alloc_page()
+        ─────────────────────────────────
+                         │
+                         ▼
+                      bitmap
+        ─────────────────────────────────
+        • raw bit operations only
+        • set / clear / test bits
+        • no knowledge of regions
+        • no allocation policy
+        ─────────────────────────────────
+                         │
+                         ▼
+                        VMM
+        ─────────────────────────────────
+        • requests frames from PMM
+        • builds page tables
+        • maps virtual → physical
+        • kernel + user allocations
+        ─────────────────────────────────
+
+Initialization flow (boot time):
+
+kernel → memap parse/normalize
+kernel → pmm_init(regions)
+pmm → compute physical bounds
+pmm → bitmap_init()
+pmm → bitmap_mark_free_pages()
+kernel → vmm_init()
+
+
+Allocation flow (runtime):
+
+kernel / drivers / heap
+        ↓
+       VMM
+        ↓
+   pmm_alloc_page()
+        ↓
+ bitmap finds free bit
+        ↓
+ physical frame returned
+

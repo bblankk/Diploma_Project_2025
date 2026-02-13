@@ -25,7 +25,7 @@ void kmain(multibootInfo_t* mbInfo) {
 
 
     //initializing pmm and vmm's initial memory readings
-    memap_Region regions[32]; ////parse, normalize, consume 
+    memap_Region regions[32]; //parse, normalize, consume 
     int32_t regionCount; // the amount of available and normalized regions, ready to be used
     regionCount = parse_Map(mbInfo, regions, 32); //parse + fill regions[32]. Returns the amount of normalized type1 regions parsed.
     // todo print regino count
@@ -33,10 +33,11 @@ void kmain(multibootInfo_t* mbInfo) {
     // todo print region count again to check its the same
 
 
-
-    
-    uint64_t bitmapPhysicalBaseAddress = (uint64_t)&kernelEnd; // now this is the numerical value for the physical address where pmm's bitmap will live
-   
+    uint64_t bitmapPhysicalBaseAddress = (uint64_t)&kernelEnd; // now this is the numerical value for the physical address where pmm's bitmap will live. Linker script gives it to us.
+   x    
+    // Now PMM owns bitmap internally; VMM will use PMM
+    void* frame = pmm_alloc_page();
+    // pass 'frame' to VMM for mapping
 
     for (;;) {}
 }

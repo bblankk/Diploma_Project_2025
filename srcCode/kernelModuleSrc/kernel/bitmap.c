@@ -16,6 +16,7 @@ Bitmap (1 byte = 8 bits):
 
 #include <stdint.h>
 #include "../include/bitmap.h"
+#include "../include/memap.h"
 
 // !! ------------------ FUNCTIONS FOR INITIALIZATION AND INITIAL CLEARS. used by kernel.
 
@@ -23,34 +24,8 @@ Bitmap (1 byte = 8 bits):
 #define PAGE_SIZE 4096 // a real memory page is 4kb, 4096 bytes.
 static uint64_t pmmTotalPages = 0; // this will be used internally.
 static uint8_t* bitmap = 0;
-
 static uint64_t physBase = 0;
 static uint64_t physTop  = 0;
-
-/* this function calculates the total pages of the final bitmap
- param regions is a pointer to the start of the regions array
- param regionCount is an unsigned integer for the total amount of expected safe-to-use regions */
-static void compute_PhysBounds(memap_Region regions[], uint32_t count)
-{
-    physBase = (uint64_t)-1;
-    physTop  = 0;
-
-    for (uint32_t i = 0; i < count; i++)
-    {
-        if (regions[i].base < physBase)
-            physBase = regions[i].base;
-
-        uint64_t end = regions[i].base + regions[i].length;
-        if (end > physTop)
-            physTop = end;
-    }
-
-    physBase &= ~(PAGE_SIZE - 1);
-    physTop   = (physTop + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
-
-    pmmTotalPages = (physTop - physBase) / PAGE_SIZE;
-}
-
 
 
 
@@ -58,14 +33,13 @@ static void compute_PhysBounds(memap_Region regions[], uint32_t count)
 //this function initiates the bitmap with the total amount of pages and marks all pages as used (1) to be later marked as free (0) when they are found in the safe-to-use regions. Used in initialization on startup.
 void bitmap_Init(memap_Region regions[], uint32_t regionCount, uint64_t bitmapBase)
 {
-    compute_PhysBounds(regions, regionCount);
-
-    uint64_t bitmapBytes = (pmmTotalPages + 7) / 8;
-
+    pmmTotalPages = totalPages;
     bitmap = (uint8_t*)bitmapBase;
-
-    for (uint64_t i = 0; i < bitmapBytes; i++)
-        bitmap[i] = 0xFF;
+    for (uint64_t i = 0; i < (totalPages + 7)/8; i++)
+    {
+           bitmap[i] = 0xFF;
+    }
+    
 }
 
 
