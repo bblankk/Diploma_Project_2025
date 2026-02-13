@@ -21,7 +21,7 @@ static uint64_t totalPages = 0;
 
  /* param regions is a pointer to the start of the regions array
  param regionCount is an unsigned integer for the total amount of expected safe-to-use regions */
-void pmm_init(memap_Region regions[], int32_t regionCount, uint64_t bitmapBase) {
+void pmm_Init(memap_Region regions[], int32_t regionCount, uint64_t bitmapBase) {
     // Compute lowest/highest physical addresses
     uint64_t physBase = UINT64_MAX;
     uint64_t physTop = 0;
@@ -39,7 +39,7 @@ void pmm_init(memap_Region regions[], int32_t regionCount, uint64_t bitmapBase) 
     bitmap_init_free_pages(regions, regionCount);
 }
 
-void* pmm_alloc_page(void) {
+void* pmm_Alloc_Page(void) {
     for (uint64_t i = 0; i < totalPages; i++) {
         if (!bitmap_test(i)) {
             bitmap_set(i);
@@ -49,12 +49,12 @@ void* pmm_alloc_page(void) {
     return NULL; // no mooore memoryyy
 }
 
-void pmm_free_page(void* phys) {
+void pmm_Free_Page(void* phys) {
     uint64_t idx = ((uint64_t)phys - bitmap_phys_base()) / 4096;
     bitmap_clear(idx);
 }
 
-uint64_t pmm_total_pages(void) { return totalPages; }
+uint64_t pmm_Total_Pages(void) { return totalPages; }
 
 
 
