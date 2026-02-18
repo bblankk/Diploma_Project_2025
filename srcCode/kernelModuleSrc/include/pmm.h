@@ -27,9 +27,7 @@ void* pmm_Alloc_Page(void);
 */
 void pmm_Free_Page(void* addr);
 
-uint64_t pmm_Get_Total_Pages(void);
-uint64_t pmm_Get_Used_Pages(void);
-uint64_t pmm_Get_Free_Pages(void);
+
 
 
 #endif 

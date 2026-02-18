@@ -24,7 +24,7 @@ Returns via iretd  */
 
 #include "gdt.h"
 
-struct gdt_entry {
+struct gdt_Entry {
     uint16_t limit_low;
     uint16_t base_low;
     uint8_t  base_middle;
@@ -33,17 +33,17 @@ struct gdt_entry {
     uint8_t  base_high;
 } __attribute__((packed));
 
-struct gdt_ptr {
+struct gdt_Ptr {
     uint16_t limit;
     uint32_t base;
 } __attribute__((packed));
 
-static struct gdt_entry gdt[3];
-static struct gdt_ptr gp;
+static struct gdt_Entry gdt[3];
+static struct gdt_Ptr gp;
 
-extern void gdt_flush(uint32_t);
+extern void gdt_Flush(uint32_t);
 
-static void gdt_set_gate(int num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran)
+static void gdt_Set_Gate(int num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran)
 {
     gdt[num].base_low    = base & 0xFFFF;
     gdt[num].base_middle = (base >> 16) & 0xFF;
@@ -56,14 +56,14 @@ static void gdt_set_gate(int num, uint32_t base, uint32_t limit, uint8_t access,
     gdt[num].access      = access;
 }
 
-void gdt_init(void)
+void gdt_Init(void)
 {
-    gp.limit = (sizeof(struct gdt_entry) * 3) - 1;
+    gp.limit = (sizeof(struct gdt_Entry) * 3) - 1;
     gp.base  = (uint32_t)&gdt;
 
-    gdt_set_gate(0, 0, 0, 0, 0);                // Null
-    gdt_set_gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // Code
-    gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // Data
+    gdt_Set_Gate(0, 0, 0, 0, 0);                // Null
+    gdt_Set_Gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // Code
+    gdt_Set_Gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // Data
 
-    gdt_flush((uint32_t)&gp);
+    gdt_Flush((uint32_t)&gp);
 }

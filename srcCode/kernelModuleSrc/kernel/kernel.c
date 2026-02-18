@@ -10,7 +10,7 @@
 #include "multiboot.h"  //later defined - multiboot protocol. needed for mem. map
 #include "memap.h" // memory map stuff
 #include "pmm.h"
-
+#include "gdt.h"
 
 // Note that linker symbols are not variables, they have no memory allocated for maintaining a value, rather their address is their value.
 extern uint8_t kernelEnd; // from linker.ld , this is a pointer to the ADDRESS Of the end of the kernel
@@ -19,6 +19,9 @@ extern uint8_t kernelEnd; // from linker.ld , this is a pointer to the ADDRESS O
 //kmain expects the ebx pointer (for the memory map) to be first argument on the stack. (pushed last)
 void kmain(multibootInfo_t* mbInfo) {
 
+    asm volatile("cli"); // disable interrupts until IDT (interrupt descriptor table) is ready
+    //global descriptor table for interrupts.
+    gdt_Init();
 
     terminal_Initialize();
     terminal_Write("Terminal initialized\n");
@@ -32,13 +35,17 @@ void kmain(multibootInfo_t* mbInfo) {
     regionCount = memap_Normalize(mbInfo, regions, 32); // page-align region base and length
     // todo print region count again to check its the same
 
+    
 
     uint64_t bitmapPhysicalBaseAddress = (uint64_t)&kernelEnd; // now this is the numerical value for the physical address where pmm's bitmap will live. Linker script gives it to us.
-    pmm_init(regions, regionCount, bitmapBase);
+    pmm_Init(regions, regionCount, bitmapPhysicalBaseAddress);
 
     // Now PMM owns bitmap internally; VMM will use PMM
-    void* frame = pmm_alloc_page();
+    void* frame = pmm_Alloc_Page();
     // pass 'frame' to VMM for mapping
+
+ 
+    
 
     for (;;) {}
 }

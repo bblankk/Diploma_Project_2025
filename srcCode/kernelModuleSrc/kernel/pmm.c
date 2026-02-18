@@ -21,7 +21,7 @@ static uint64_t totalPages = 0;
 
  /* param regions is a pointer to the start of the regions array
  param regionCount is an unsigned integer for the total amount of expected safe-to-use regions */
-void pmm_Init(memap_Region regions[], int32_t regionCount, uint64_t bitmapBase) {
+void pmm_Init(memap_Region regions[], uint32_t regionCount, uint64_t bitmapBase) {
     // Compute lowest/highest physical addresses
     uint64_t physBase = UINT64_MAX;
     uint64_t physTop = 0;

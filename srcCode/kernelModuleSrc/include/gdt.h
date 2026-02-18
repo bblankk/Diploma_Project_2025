@@ -4,6 +4,6 @@
 #include <stdint.h>
 
 // global descriptor table initialization. once during compile time.
-void gdt_init(void);
+void gdt_Init(void);
 
 #endif
