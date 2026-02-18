@@ -22,6 +22,8 @@ void kmain(multibootInfo_t* mbInfo) {
     asm volatile("cli"); // disable interrupts until IDT (interrupt descriptor table) is ready
     //global descriptor table for interrupts.
     gdt_Init();
+    idt_Init();
+    asm volatile("sti");   // enable interrupts
 
     terminal_Initialize();
     terminal_Write("Terminal initialized\n");
