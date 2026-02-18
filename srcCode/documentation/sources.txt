@@ -25,3 +25,7 @@ here's what i used:
 geany (text editor but for assembly)
 qemu (for system emulation)
 nasm (for assembling) 
+
+microkernel design inspo:
+https://medium.com/@tunacici7/sel4-microkernel-architecture-130efb8d34d7
+
