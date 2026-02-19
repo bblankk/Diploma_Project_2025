@@ -1,6 +1,7 @@
 //interrupt descriptor table. To be used hand in hand with GDT, the global descriptor table.
 #include "idt.h"
 
+
 struct idt_Entry {
     uint16_t base_low;
     uint16_t selector;
@@ -14,11 +15,13 @@ struct idt_Ptr {
     uint32_t base;
 } __attribute__((packed));
 
-static struct idt_Entry idt[256];
-static struct idt_Ptr   idtp;
-
+//variables
+static struct idt_Entry idt[256]; //idt entry
+static struct idt_Ptr idtp; //idt pointer to entry
 extern void idt_Load(uint32_t);
-extern void isr0();   // we’ll define this in assembly
+extern void isr0();   // defined in assembly
+
+
 
 static void idt_Set_Gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags)
 {
@@ -39,8 +42,10 @@ void idt_Init(void)
     for (int i = 0; i < 256; i++)
         idt_Set_Gate(i, 0, 0, 0);
 
-    // Example: CPU exception 0 (Divide by Zero)
+    // CPU exception 0 (Divide by Zero)
     idt_Set_Gate(0, (uint32_t)isr0, 0x08, 0x8E);
+    // timer interrupt 32
+    idt_Set_Gate(32, (uint32_t)irq0, 0x08, 0x8E);
 
     idt_Load((uint32_t)&idtp);
 }
