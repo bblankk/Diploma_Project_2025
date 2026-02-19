@@ -4,6 +4,7 @@
 
 static uint32_t tick = 0;
 
+//interrupt request 0 - the reclusive timer! muhaha
 void irq0_Handler(void)
 {
     tick++;
