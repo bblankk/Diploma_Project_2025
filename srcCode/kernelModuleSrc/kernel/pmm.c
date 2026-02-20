@@ -9,38 +9,56 @@ static uint64_t totalPages = 0;
 
 
  /* param regions is a pointer to the start of the regions array
- param regionCount is an unsigned integer for the total amount of expected safe-to-use regions */
-void pmm_Init(memap_Region regions[], uint32_t regionCount, uint64_t bitmapBase) {
-    // Compute lowest/highest physical addresses
-    uint64_t physBase = UINT64_MAX;
+ param regionCount is an unsigned integer for the total amount of expected safe-to-use regions
+ bitmap base is the phys address the bitmap starts. */
+void pmm_Init(memap_Region regions[], uint32_t regionCount, uint64_t bitmapBase)
+{
     uint64_t physTop = 0;
-    for (int i = 0; i < regionCount; i++) {
-        if (regions[i].base < physBase) physBase = regions[i].base;
+
+    for(uint32_t i=0;i<regionCount;i++)
+    {
         uint64_t end = regions[i].base + regions[i].length;
-        if (end > physTop) physTop = end;
+        if(end > physTop)
+            physTop = end;
     }
-    physBase &= ~(4096-1);
-    physTop   = (physTop + 4095) & ~(4096-1);
 
-    totalPages = (physTop - physBase)/4096;
+    physTop = (physTop + 4095) & ~(4095);
 
-    bitmap_init(bitmapBase, totalPages);
-    bitmap_init_free_pages(regions, regionCount);
+    totalPages = physTop / 4096;
+
+    bitmap_Init(totalPages, bitmapBase); // initialize bitmap (all pages used)
+    bitmap_InitFreePages(regions, regionCount); //free usable pages
+    
+    // reserve kernel pages.
+    extern uint8_t kernelEnd; // from linker.ld - pointer to kernel's end
+    uint64_t kernelEndAddr = (uint64_t)&kernelEnd;  // converts pointer to an address
+    uint64_t kernelPages = (kernelEndAddr + 4095)/4096; //calculates how many pages the kernel occupies
+    for(uint64_t i = 0; i < kernelPages; i++)
+    {
+         bitmap_set(i); // mark all kernel pages as used, so the PMM may not use them.
+    }
+       
+
 }
 
-void* pmm_Alloc_Page(void) {
-    for (uint64_t i = 0; i < totalPages; i++) {
-        if (!bitmap_test(i)) {
+void* pmm_Alloc_Page(void)
+{
+    for(uint64_t i=0;i<totalPages;i++)
+    {
+        if(!bitmap_test(i))
+        {
             bitmap_set(i);
-            return (void*)(bitmap_phys_base() + i*4096);
+            return (void*)(i*4096);
         }
     }
-    return NULL; // no mooore memoryyy
+
+    return NULL;
 }
 
-void pmm_Free_Page(void* phys) {
-    uint64_t idx = ((uint64_t)phys - bitmap_phys_base()) / 4096;
-    bitmap_clear(idx);
+void pmm_Free_Page(void* addr)
+{
+    uint64_t index = ((uint64_t)addr)/4096;
+    bitmap_clear(index);
 }
 
 uint64_t pmm_Total_Pages(void) { return totalPages; }
