@@ -1,21 +1,10 @@
-//PHYSICAL MEMORY ALLOCATOR, ALSO CALLED PMM (PHYSICAL MEMORY MANAGER) - MAIN FUNCTIONALITY LIVES HERE <22
-
+//PHYSICAL MEMORY MANAGER (ALLOCATOR), shortened to PMM
 #include <stddef.h>
 #include <stdint.h>
 #include "../include/pmm.h"
 #include "../include/bitmap.h"
 
-//second: a small contiguous pool tracked by a bitmap
-//these will be used for the bitmap
-
-//bitmap steps; decide the physical address range - lowest to highest for all regions
-// compute total page count for every region
-// allocate bitmap storage
-// initialize all bits 
-// walk usable regions to check if everythin workin ??
-// functions for allocating / deallocating  pages
-
-//bitmap isnt here, its in bitmap.c. PMM only manipulates it, but it's here.
+//bitmap isnt here, its in bitmap.c. PMM only manipulates it, but it's not here.
 static uint64_t totalPages = 0;
 
 

@@ -1,4 +1,3 @@
-
 /* These functions are used in the kernel , sequentially AFTER memap initialization, which they rely on.
 
 1 page = 4096 bytes (real memory)
@@ -12,6 +11,12 @@ real mem:
 Bitmap (1 byte = 8 bits):
 [1 0 0 1 1 0 0 0]
 
+in conclusion: 
+
+one bit = one physical page
+index = physAddr / 4096
+bitmap stored at bitmapBase
+PMM scans bitmap for free pages
 */
 
 #include <stdint.h>
@@ -21,25 +26,24 @@ Bitmap (1 byte = 8 bits):
 // !! ------------------ FUNCTIONS FOR INITIALIZATION AND INITIAL CLEARS. used by kernel.
 
 
-#define PAGE_SIZE 4096 // a real memory page is 4kb, 4096 bytes.
-static uint64_t pmmTotalPages = 0; // this will be used internally.
+#define PAGE_SIZE 4096
+
+static uint64_t totalPages = 0;
 static uint8_t* bitmap = 0;
-static uint64_t physBase = 0;
-static uint64_t physTop  = 0;
 
 
 
 
 //this function initiates the bitmap with the total amount of pages and marks all pages as used (1) to be later marked as free (0) when they are found in the safe-to-use regions. Used in initialization on startup.
-void bitmap_Init(memap_Region regions[], uint32_t regionCount, uint64_t bitmapBase)
+void bitmap_Init(uint64_t pages, uint64_t bitmapBase)
 {
-    pmmTotalPages = totalPages;
+    totalPages = pages;
     bitmap = (uint8_t*)bitmapBase;
-    for (uint64_t i = 0; i < (totalPages + 7)/8; i++)
-    {
-           bitmap[i] = 0xFF;
-    }
-    
+
+    uint64_t bytes = (pages + 7) / 8;
+
+    for (uint64_t i = 0; i < bytes; i++)
+        bitmap[i] = 0xFF;   // mark all used
 }
 
 
@@ -48,41 +52,29 @@ void bitmap_Init(memap_Region regions[], uint32_t regionCount, uint64_t bitmapBa
 // frees all usable pages, aka flags them 0 on the internal bookkeeping. This is for initialization on startup.
 void bitmap_InitFreePages(memap_Region regions[], uint32_t regionCount)
 {
-    for(uint32_t i =0 ; i< regionCount; i++)
+    for(uint32_t i=0;i<regionCount;i++)
     {
-        if(regions[i].type == 1) // if the region is usable
-        {
-            uint64_t start = regions[i].base;
-            uint64_t end   = regions[i].base + regions[i].length;
-            for (uint64_t addr = start; addr < end; addr += PAGE_SIZE) // loops every real mem page in the region. 
-                {
-                    uint64_t page_index = (addr - physBase) / PAGE_SIZE;
-                    uint64_t byte = page_index / 8;
-                    uint8_t  bit  = page_index % 8;
+        if(regions[i].type != 1)
+            continue;
 
-                    bitmap[byte] &= (uint8_t)~(1u << bit); // more shenanighans. long story short, only the current bit(page flag) gets freed. long story below.
-                }
+        uint64_t start = regions[i].base;
+        uint64_t end   = start + regions[i].length;
+
+        for(uint64_t addr = start; addr < end; addr += PAGE_SIZE)
+        {
+            uint64_t index = addr / PAGE_SIZE;
+            bitmap_clear(index);
         }
     }
 }
-/* 
-explanation for line : bitmap[byte] &= ~(1 << bit)
-bitmap[byte] = 0b11111111   // all pages used
-bit = 3                       // page we want to free
-1 << 3    = 0b00001000
-~(1<<3)   = 0b11110111       // mask: flip that bit
-AND with bitmap:
-0b11111111 & 0b11110111 = 0b11110111 
-*/
 
 
 
 
 
 
-// !! ------------------------------- FUNCTIONS FOR ALLOCATING/DEALLOCATING/TESTING BITS. Used by PMM & VMM.
+// !! ------------------------------- FUNCTIONS FOR ALLOCATING/DEALLOCATING/TESTING BITS. Used by PMM.
 //used later.
-
 void bitmap_set(uint64_t index)
 {
     bitmap[index / 8] |= (uint8_t)(1u << (index % 8));
@@ -99,8 +91,9 @@ uint8_t bitmap_test(uint64_t index)
 }
 
 
+
 // optional getter so PMM can know limits
-uint64_t bitmap_total_pages(void)
+uint64_t bitmap_TotalPages(void)
 {
-    return pmmTotalPages;
+    return totalPages;
 }
