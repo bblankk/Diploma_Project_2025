@@ -20,8 +20,6 @@ isr0:
     sti
     iretd
 
-
-
 irq0:
     cli
     pusha

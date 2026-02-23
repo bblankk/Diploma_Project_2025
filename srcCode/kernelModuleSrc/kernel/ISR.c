@@ -6,4 +6,4 @@ void isr0_Handler(void)
 {
     terminal_Write("Divide by zero exception!\n");
     for (;;);
-}
+} 

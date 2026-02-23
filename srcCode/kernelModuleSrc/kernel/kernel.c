@@ -34,8 +34,8 @@ void kmain(multibootInfo_t* mbInfo) {
     asm volatile("sti");   // enable interrupts
 
     terminal_Write("Before PMM\n");
-
-    //initializing pmm and vmm's initial memory readings
+    
+    +//initializing pmm and vmm's initial memory readings
     memap_Region regions[32]; //parse, normalize, consume 
     int32_t regionCount; // the amount of available and normalized regions, ready to be used
     regionCount = parse_Map(mbInfo, regions, 32); //parse + fill regions[32]. Returns the amount of normalized type1 regions parsed.
