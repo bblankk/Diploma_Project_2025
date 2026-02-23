@@ -1,0 +1,20 @@
+About the interrupt dispatch system.
+
+Lots of interrupts being fired left and right, and everybody wants attention - not to mention there's a hundred different ways to deal with them - handler this, handler that. In conclusion, we need one big manager to delegate tasks around - one that we can track to see what requests are coming in, and where they're going, and if they ever get completed. 
+
+This is implemented in a layer i'm calling (though I am not the first and will not be the last to call it that) the interrupt dispatch system. All interrupts enter through one common function that decides what to call (which 'interrupt handler' to call). This function is in isr.c. If you see interrupt handlers in the code, refer to the interrupt descriptor table for what they do, not the dispatch handler. That calls their handlers and works more closely w the CPU than anything.
+
+1. Basic Structure
+ASM ISR stub - common handler - delegation - specific handler
+
+About the handlers.
+Of course, there's the global interrupt handler, about which i've been writing about. The one that delegates, doesn't really handle anyone. Then there's the first delegation level - the request is given to either the external, or internal handlers. 
+
+
+Example flow for IRQ0: (timer interrupt)
+
+IRQ0 fires
+ → irq0_stub (ASM)
+ → isr_global_handler(struct regs *r)
+ → interrupt_handlers[r->int_no](r)
+ → timer_handler()

@@ -19,8 +19,8 @@ struct idt_Ptr {
 static struct idt_Entry idt[256]; //idt entry
 static struct idt_Ptr idtp; //idt pointer to entry
 extern void idt_Load(uint32_t);
-extern void isr0();   // defined in assembly
-
+extern void isr0();   // divide by 0
+extern void irq0();  // ... timer? i think.
 
 
 static void idt_Set_Gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags)

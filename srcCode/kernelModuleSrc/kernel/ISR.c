@@ -2,7 +2,7 @@
 
 #include "terminal.h"
 
-void isr0_handler(void)
+void isr0_Handler(void)
 {
     terminal_Write("Divide by zero exception!\n");
     for (;;);

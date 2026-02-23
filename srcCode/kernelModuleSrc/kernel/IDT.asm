@@ -2,7 +2,10 @@
 
 global idt_Load
 global irq0
+global isr0
+
 extern irq0_Handler
+extern isr0_Handler
 
 idt_Load:
     mov eax, [esp+4]
@@ -12,7 +15,7 @@ idt_Load:
 isr0:
     cli
     pusha
-    call isr0_handler
+    call isr0_Handler
     popa
     sti
     iretd

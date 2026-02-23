@@ -11,6 +11,8 @@
 #include "memap.h" // memory map stuff
 #include "pmm.h"
 #include "gdt.h"
+#include "idt.h"
+#include "pic.h"
 
 // Note that linker symbols are not variables, they have no memory allocated for maintaining a value, rather their address is their value.
 extern uint8_t kernelEnd; // from linker.ld , this is a pointer to the ADDRESS Of the end of the kernel
@@ -24,11 +26,14 @@ void kmain(multibootInfo_t* mbInfo) {
     gdt_Init(); //global descriptor table - defines code, data, and what it means to be lost and chase hopes down the highway.
     idt_Init(); // internal descriptor table - for internal CPU exceptions
     pic_Remap(); //programmable interrupt controller - for external exceptions
-    asm volatile("sti");   // enable interrupts
-
+    
     terminal_Initialize();
     terminal_Write("Terminal initialized\n");
 
+
+    asm volatile("sti");   // enable interrupts
+
+    terminal_Write("Before PMM\n");
 
     //initializing pmm and vmm's initial memory readings
     memap_Region regions[32]; //parse, normalize, consume 
