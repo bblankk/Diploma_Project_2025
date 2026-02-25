@@ -5,7 +5,8 @@
 
 // a snapshot of the CPU state at the time of an interrupt. Well, a snapshot of the stack , lol. Those registers get pushed IN THAT ORDER in IDT.asm before any actual handlers get called. Save first, edit later! haha. Mostly used for flagging and such. and restoring state.
 typedef struct interrupt_Context {
-    //registers
+
+    // stack snapshot
     uint32_t edi;
     uint32_t esi;
     uint32_t ebp;
@@ -16,19 +17,16 @@ typedef struct interrupt_Context {
     uint32_t ecx;
     uint32_t eax;
 
-    // interrupt number (used for gates) and error code.
+    // I really think the names are self-explanatory. Do you WANT to read more comments?
     uint32_t interruptNumber;
     uint32_t errorCode;
 
-    //nonsense really. I haven't used them yet and probably won't till debugging demands it. Would look cool on a chart though.
-    uint32_t instructionPointer;
-    uint32_t codeSegment;
-    uint32_t flags;
-    uint32_t stackPointer;
-    uint32_t stackSegment;
-
 } interrupt_Context;
 
+// easier to read later on so.. i just defined it..
+typedef void (*InterruptHandler)(interrupt_Context *context);
+// 
+void registerInterruptHandler(uint8_t interruptNumber, InterruptHandler handler);
 //interrupt delegator function; main functionality
 // function takes 1 param type interrupt_Context and returns nothing.
 void globalInterruptDelegator(interrupt_Context *context);

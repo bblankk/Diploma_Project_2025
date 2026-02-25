@@ -57,13 +57,13 @@ static void gdt_Set_Gate(int num, uint32_t base, uint32_t limit, uint8_t access,
 }
 
 void gdt_Init(void)
-{ 
+{
     gp.limit = (sizeof(struct gdt_Entry) * 3) - 1;
     gp.base  = (uint32_t)&gdt;
 
-    gdt_Set_Gate(0, 0, 0, 0, 0);                // Null
-    gdt_Set_Gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // Code
-    gdt_Set_Gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // Data
+    gdt_set_gate(0, 0, 0, 0, 0);                // Null
+    gdt_set_gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // Code
+    gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // Data
 
-    gdt_Flush((uint32_t)&gp);
+    gdt_flush((uint32_t)&gp);
 }

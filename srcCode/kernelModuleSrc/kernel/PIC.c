@@ -6,8 +6,8 @@ This is a chip on the motherboard the CPU runs to when there's an external inter
 We have to reprogram it so it doesn't conflict with the CPU interrupt numbers. (allegedly,it currently does.)
 */
 /*
-0–31 = CPU exceptions
-32–47 = hardware interrupts
+0 - 31 = CPU exceptions
+32 - 47 = hardware interrupts
 timer IRQ0 ? IDT[32] ? timer handler
 */
 // PIT (programmer interval timer ) also just known as the timer or internal clock, is crucial to multitasking and used by the scheduler. Everybody say thank you, PIT(bull)!
