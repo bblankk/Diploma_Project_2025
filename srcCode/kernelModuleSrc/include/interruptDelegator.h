@@ -1,29 +1,36 @@
-//interrupt service routines
-//only shared interrupt definitions
+#ifndef INTERRUPT_DELEGATOR_H
+#define INTERRUPT_DELEGATOR_H
+#include <stdint.h>
 
-// a snapshot of the CPU state at the time of an interrupt. Mostly used for flagging and such.
-typedef struct interrupt_Context
-{
-    // saves registers
-    uint64_t rax;
-    uint64_t rbx;
-    uint64_t rcx;
-    uint64_t rdx;
-    // saves... well. heh.
-    uint64_t interruptNumber;
-    uint64_t errorCode;
-    // stack location, interrupt number, flags etc. 
-    uint64_t instructionPointer;
-    uint64_t codeSegment;
-    uint64_t flags;
-    uint64_t stackPointer;
-    uint64_t stackSegment;
+
+// a snapshot of the CPU state at the time of an interrupt. Well, a snapshot of the stack , lol. Those registers get pushed IN THAT ORDER in IDT.asm before any actual handlers get called. Save first, edit later! haha. Mostly used for flagging and such. and restoring state.
+typedef struct interrupt_Context {
+    //registers
+    uint32_t edi;
+    uint32_t esi;
+    uint32_t ebp;
+    uint32_t esp;
+
+    uint32_t ebx;
+    uint32_t edx;
+    uint32_t ecx;
+    uint32_t eax;
+
+    // interrupt number (used for gates) and error code.
+    uint32_t interruptNumber;
+    uint32_t errorCode;
+
+    //nonsense really. I haven't used them yet and probably won't till debugging demands it. Would look cool on a chart though.
+    uint32_t instructionPointer;
+    uint32_t codeSegment;
+    uint32_t flags;
+    uint32_t stackPointer;
+    uint32_t stackSegment;
 
 } interrupt_Context;
 
+//interrupt delegator function; main functionality
+// function takes 1 param type interrupt_Context and returns nothing.
+void globalInterruptDelegator(interrupt_Context *context);
 
-typedef void (*InterruptHandler)(CPURegisters *);
-
-void register_Interrupt_Handler( uint8_t interruptNumber, InterruptHandler handler );
-
-void global_Interrupt_Delegator( CPURegisters *registers );
+#endif

@@ -1,12 +1,23 @@
 //interrupt descriptor table. To be used hand in hand with GDT, the global descriptor table.
+//It does not handle interrupts. It only defines where each interrupt points.
+/* 
+responsibilities:
+build IDT entries (a .. list, map, of just pointers to different handlers. They will probably be defined at IRQHandler.c)
+set addresses of interrupt requests (irqs)
+load IDT
+
+-- without this, the CPU won't know where irq0 lives. 
+*/
 #include "idt.h"
 
-
+/*
+every idt entry is called a 'gate descriptor'. A gate contains the stuff below. 
+*/
 struct idt_Entry {
-    uint16_t base_low;
-    uint16_t selector;
-    uint8_t  zero;
-    uint8_t  flags;
+    uint16_t base_low; //address to jump to
+    uint16_t selector; //segment selector
+    uint8_t  zero; //type : itnerrupt or trap gate. don't ask me about trap gates.
+    uint8_t  flags; //flags 
     uint16_t base_high;
 } __attribute__((packed));
 
@@ -23,6 +34,7 @@ extern void isr0();   // divide by 0
 extern void irq0();  // ... timer? i think.
 
 
+//basically writes a gate based on the descriptor. A gate, mind you, is a glorified pointer with a litle bit more information.
 static void idt_Set_Gate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags)
 {
     idt[num].base_low  = base & 0xFFFF;
