@@ -3,8 +3,7 @@
 #define MEMAP_H
 
 #include <stdint.h>
-#include "multiboot.h" //struct def
-#include "pmm.h"
+#include "multiboot.h" //multiboot structs, yikes!
 
 
 typedef struct

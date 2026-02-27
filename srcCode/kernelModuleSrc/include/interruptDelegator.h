@@ -23,9 +23,9 @@ typedef struct interrupt_Context {
 
 } interrupt_Context;
 
-// easier to read later on so.. i just defined it..
+// easier to read later on so.. interruptHandler is a ptr to a function that returns void, and takes param interrupt_Context
 typedef void (*InterruptHandler)(interrupt_Context *context);
-// 
+// fills the interrupt handler table
 void registerInterruptHandler(uint8_t interruptNumber, InterruptHandler handler);
 //interrupt delegator function; main functionality
 // function takes 1 param type interrupt_Context and returns nothing.

@@ -14,7 +14,8 @@
    regionCount   = number of entries in regions[]
    bitmapBase    = physical address where the bitmap will live
 */
-void pmm_Init(memap_Region regions[], uint32_t regionCount, uint64_t bitmapBase);
+void pmm_Init(memap_Region regions[], uint32_t regionCount, uint32_t bitmapBase);
+void bitmap_InitFreePages(memap_Region regions[], uint32_t regionCount);
 
 /* allocate one physical page (4KB)
    returns physical address of the page
@@ -26,7 +27,7 @@ void* pmm_Alloc_Page(void);
    addr must be page-aligned physical address
 */
 void pmm_Free_Page(void* addr);
-
+uint32_t pmm_Total_Pages(void);
 
 
 

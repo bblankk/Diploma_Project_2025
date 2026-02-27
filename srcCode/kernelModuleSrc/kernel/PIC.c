@@ -69,7 +69,7 @@ void pic_Remap(void)
 
 // this is called when the exception has been handled , to let the CPU know it can proceed! VERY important if you don't want PIC to get stuck inside an interrupt!!
 //this is only needed for external interrupts, as internal (CPU) interrupts have their own way of knowing when they're done.
-void pic_SendEOI(unsigned char irq)
+void pic_SendEOI(unsigned char irq) //end of exception = EOI
 {
     if (irq >= 8)
         portByteOut(PIC2_COMMAND, 0x20);

@@ -9,6 +9,7 @@
  #include "terminal.h"  // terminal functionality
 #include "multiboot.h"  // multiboot protocol. needed for memory map.
 #include "memap.h" // memory map functionality , aka bitmap shenanighans.
+#include "pic.h"
 #include "pmm.h"
 #include "gdt.h"
 #include "idt.h"
@@ -28,6 +29,7 @@ void kmain(multibootInfo_t* mbInfo) {
     terminal_Initialize();
     terminal_Write("Terminal initialized\n");
 
+    terminal_Write("Before PMM\n");
     //initializing pmm and vmm's initial memory readings
     memap_Region regions[32]; //parse, normalize, consume 
     int32_t regionCount; // the amount of available and normalized regions, ready to be used
@@ -35,22 +37,24 @@ void kmain(multibootInfo_t* mbInfo) {
     // todo print regins count
     regionCount = memap_Normalize(mbInfo, regions, 32); // page-align region base and length
     // todo print region count again to check its the same
-
-    uint64_t bitmapPhysicalBaseAddress = (uint64_t)&kernelEnd; // now this is the numerical value for the physical address where pmm's bitmap will live. Linker script gives it to us.
+    uint32_t bitmapPhysicalBaseAddress = (uint32_t)&kernelEnd; // now this is the numerical value for the physical address where pmm's bitmap will live. Linker script gives it to us.
     pmm_Init(regions, regionCount, bitmapPhysicalBaseAddress);
+    terminal_Write("PMM initialized.\n Before GDT \n");
 
-
-   
     //global descriptor table for interrupts.
     gdt_Init(); //global descriptor table - defines code, data, and what it means to be lost and chase hopes down the highway.
+    terminal_Write("GDT initialized. \n Before IDT. ");
     idt_Init(); // internal descriptor table - for internal CPU exceptions
+    terminal_Write("IDT initialized. \n Before PIC remapping \n");
     pic_Remap(); //programmable interrupt controller - for external exceptions
+    terminal_Write("PIC remap done. \n Before filling IDT \n");
 
     
     // filling the interrupt table (IDT) 
+    // 
     registerInterruptHandler(32, irq0_Handler);
     registerInterruptHandler(0,isr0_Handler);
-
+    terminal_Write("IDT filled. \n");
 
     asm volatile("sti"); // enable interrupts.
 

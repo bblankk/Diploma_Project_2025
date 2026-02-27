@@ -28,72 +28,45 @@ PMM scans bitmap for free pages
 
 #define PAGE_SIZE 4096
 
-static uint64_t totalPages = 0;
+static uint32_t totalPages = 0;
 static uint8_t* bitmap = 0;
 
 
-
-
 //this function initiates the bitmap with the total amount of pages and marks all pages as used (1) to be later marked as free (0) when they are found in the safe-to-use regions. Used in initialization on startup.
-void bitmap_Init(uint64_t pages, uint64_t bitmapBase)
+void bitmap_Init(uint32_t pages, uint32_t bitmapBase)
 {
     totalPages = pages;
     bitmap = (uint8_t*)bitmapBase;
 
-    uint64_t bytes = (pages + 7) / 8;
+    uint32_t bytes = (pages + 7) / 8;
 
-    for (uint64_t i = 0; i < bytes; i++)
+    for (uint32_t i = 0; i < bytes; i++)
         bitmap[i] = 0xFF;   // mark all used
 }
 
 
 
-
-// frees all usable pages, aka flags them 0 on the internal bookkeeping. This is for initialization on startup.
-void bitmap_InitFreePages(memap_Region regions[], uint32_t regionCount)
-{
-    for(uint32_t i=0;i<regionCount;i++)
-    {
-        if(regions[i].type != 1)
-            continue;
-
-        uint64_t start = regions[i].base;
-        uint64_t end   = start + regions[i].length;
-
-        for(uint64_t addr = start; addr < end; addr += PAGE_SIZE)
-        {
-            uint64_t index = addr / PAGE_SIZE;
-            bitmap_clear(index);
-        }
-    }
-}
-
-
-
-
-
-
 // !! ------------------------------- FUNCTIONS FOR ALLOCATING/DEALLOCATING/TESTING BITS. Used by PMM.
 //used later.
-void bitmap_set(uint64_t index)
+void bitmap_set(uint32_t index)
 {
-    bitmap[index / 8] |= (uint8_t)(1u << (index % 8));
+    bitmap[index / 8] |= (1u << (index % 8));
 }
 
-void bitmap_clear(uint64_t index)
+void bitmap_clear(uint32_t index)
 {
-    bitmap[index / 8] &= (uint8_t)~(1u << (index % 8));
+    bitmap[index / 8] &= ~(1u << (index % 8));
 }
 
-uint8_t bitmap_test(uint64_t index)
+uint8_t bitmap_test(uint32_t index)
 {
-    return (bitmap[index / 8] >> (index % 8)) & 1u;
+     return (bitmap[index / 8] >> (index % 8)) & 1u;
 }
 
 
 
 // optional getter so PMM can know limits
-uint64_t bitmap_TotalPages(void)
+uint32_t bitmap_TotalPages(void)
 {
     return totalPages;
 }

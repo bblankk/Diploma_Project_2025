@@ -5,35 +5,36 @@
 #include "../include/bitmap.h"
 
 //bitmap isnt here, its in bitmap.c. PMM only manipulates it, but it's not here.
-static uint64_t totalPages = 0;
-
+static uint32_t totalPages = 0;
+#define PAGE_SIZE 4096
 
  /* param regions is a pointer to the start of the regions array
  param regionCount is an unsigned integer for the total amount of expected safe-to-use regions
  bitmap base is the phys address the bitmap starts. */
-void pmm_Init(memap_Region regions[], uint32_t regionCount, uint64_t bitmapBase)
+void pmm_Init(memap_Region regions[], uint32_t regionCount, uint32_t bitmapBase)
 {
-    uint64_t physTop = 0;
+    uint32_t physTop = 0;
 
+    //finding highest physical address of the memap
     for(uint32_t i=0;i<regionCount;i++)
     {
-        uint64_t end = regions[i].base + regions[i].length;
+        uint32_t end = (uint32_t)(regions[i].base + regions[i].length);
         if(end > physTop)
             physTop = end;
     }
 
-    physTop = (physTop + 4095) & ~(4095);
-
-    totalPages = physTop / 4096;
+    //  page align 
+    physTop = (physTop + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
+    totalPages = physTop / PAGE_SIZE;
 
     bitmap_Init(totalPages, bitmapBase); // initialize bitmap (all pages used)
     bitmap_InitFreePages(regions, regionCount); //free usable pages
     
     // reserve kernel pages.
     extern uint8_t kernelEnd; // from linker.ld - pointer to kernel's end
-    uint64_t kernelEndAddr = (uint64_t)&kernelEnd;  // converts pointer to an address
-    uint64_t kernelPages = (kernelEndAddr + 4095)/4096; //calculates how many pages the kernel occupies
-    for(uint64_t i = 0; i < kernelPages; i++)
+    uint32_t kernelEndAddr = (uint32_t)&kernelEnd;  // converts pointer to an address
+    uint32_t kernelPages =(kernelEndAddr + PAGE_SIZE - 1) / PAGE_SIZE; //calculates how many pages the kernel occupies
+    for(uint32_t i = 0; i < kernelPages; i++)
     {
          bitmap_set(i); // mark all kernel pages as used, so the PMM may not use them.
     }
@@ -41,14 +42,33 @@ void pmm_Init(memap_Region regions[], uint32_t regionCount, uint64_t bitmapBase)
 
 }
 
+// frees all usable pages, aka flags them 0 on the internal bookkeeping. This is for initialization on startup. used in pmm_Init.
+void bitmap_InitFreePages(memap_Region regions[], uint32_t regionCount)
+{
+    for(uint32_t i=0;i<regionCount;i++)
+    {
+        if(regions[i].type != 1)
+            continue;
+
+        uint32_t start = (uint32_t)regions[i].base;
+        uint32_t end   = (uint32_t)(regions[i].base + regions[i].length);
+
+        for(uint32_t addr = start; addr < end; addr += PAGE_SIZE)
+        {
+            uint32_t index = addr / PAGE_SIZE;
+            bitmap_clear(index);
+        }
+    }
+}
+
 void* pmm_Alloc_Page(void)
 {
-    for(uint64_t i=0;i<totalPages;i++)
+    for(uint32_t i=0;i<totalPages;i++)
     {
         if(!bitmap_test(i))
         {
             bitmap_set(i);
-            return (void*)(i*4096);
+            return (void*)(i*PAGE_SIZE);
         }
     }
 
@@ -57,11 +77,14 @@ void* pmm_Alloc_Page(void)
 
 void pmm_Free_Page(void* addr)
 {
-    uint64_t index = ((uint64_t)addr)/4096;
+    uint32_t index = ((uint32_t)addr)/PAGE_SIZE;
     bitmap_clear(index);
 }
 
-uint64_t pmm_Total_Pages(void) { return totalPages; }
+uint32_t pmm_Total_Pages(void)
+{
+     return totalPages; 
+}
 
 
 

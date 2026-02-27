@@ -383,3 +383,6 @@ We're going to use two different concepts and see how compatible they are with w
 A FAST but 0 security approach: letting programs decide how and how much memory they're going to use.
 Security approach: giving each process a key . 
 smush em. ! mush em !!!
+
+27/02 
+dispatch layer officially complete. and what would you know, everything links , compiles, and RUNS. truly a once in a lifetime moment. unfortunately, it may be time (nooo) to work on the terminal now. i was really avoiding this until i had something to print, and now i do. sad times .

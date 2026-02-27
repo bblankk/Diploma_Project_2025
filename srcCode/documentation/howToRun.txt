@@ -1,0 +1,47 @@
+How to compile and run the project, including needed dependencies.
+Hello! sometimes, i wonder this too. Not today though, because I have to write this guide for you today!
+You will need a linux or linux-adjacent command line. I use WLS on windows.
+// to do : video tut
+
+If you use linux, skip this part.
+download wsl for Intel or AMD 64-bit architecture (though i'm certain it'll work all the same with ARM, so don't sweat it)
+https://ubuntu.com/desktop/wsl
+Inside Diploma_Project_2025\srcCode\kernelModuleSrc
+you will see a makefile. That's where you want to be. run a CMD there (write CMD in file explorer where the filepath is)(or open cmd the normal way and cd there) (i'm sorry, yes , you'll have to use the command prompt, but i've made it as easy as i can for you) and run <wsl>.
+
+
+Inside WSL or a normal linux terminal (sorry, this is for ubuntu users, though i'm sure you could tweak the commands..?):
+sudo apt update
+sudo apt install build-essential \
+                 gcc-multilib \
+                 nasm \
+                 qemu-system-x86
+
+
+what these do:
+build-essential: allows linker, downloads the GCC compiler (you'll need it)
+gcc-multilib : allows -m32 , compiling 32bit . The OS is 32 bit, so you'll need it for explicit compiling.
+nasm : an assembler for assembly file.
+qemu-system-x86 : this is the bootloader. basically a startup that runs the kernel. (gotta go from nothing to something somehow)
+
+
+Please cd into Diploma_Project_2025\srcCode\kernelModuleSrc ( if you aren't already there). The makefile is there, so your terminal will need to see and use it. You have access to these 3 commands (made by me with love) now:
+make clean
+make
+make run
+
+Use them in that order. Ignore all warnings in between (they're not as bad as they look). after doing so once, you will only need to use make run in subsequent startups of the project, as it's already been compiled locally. 
+
+
+
+common errors: 
+- during package installing
+fatal error: bits/libc-header-start.h: No such file or directory 
+fix : sudo apt install gcc-multilib g++-multilib
+
+during make run:
+if qemu doesn't start:
+qemu-system-i386 --version
+if not found, 
+sudo apt install qemu-system-x86
+	
