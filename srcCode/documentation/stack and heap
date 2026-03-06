@@ -1,0 +1,20 @@
+1. Stack (Automatic & Runtime)
+When: Memory is allocated on the stack at runtime when a function is called and automatically deallocated when the function returns.
+What: It stores local variables, function parameters, and return addresses.
+Why it's confused with "Compile Time": The size of the stack frame (how much memory is needed) for a function is often calculated by the compiler, but the actual allocation happens at runtime.
+Key Traits: Very fast, limited in size, Last-In-First-Out (LIFO). 
+  GROWS DOWN
+2. Heap (Dynamic & Runtime)
+When: Memory is allocated on the heap at runtime using specific commands (e.g., malloc in C, new in C++ or Java).
+What: It stores data that needs to persist beyond the function that created it, or data whose size is not known until the program is running.
+Key Traits: Slower than stack, large size, requires manual management (in C/C++) or garbage collection (in Java/Python). 
+  GROWS UP
+
+
+  Summary Comparison
+Feature 	                                            Stack	Heap
+Allocation Time	Runtime (when function is called)	    Runtime (when needed)
+Management	Automatic (by compiler/CPU)	              Manual/Garbage Collected
+Speed	Fast	                                          Slower
+Size	Small, fixed	                                  Large, flexible
+Lifetime	Limited to function scope	                  Until explicitly freed
