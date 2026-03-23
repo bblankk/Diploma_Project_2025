@@ -45,11 +45,12 @@ void kmain(multibootInfo_t* mbInfo) {
     gdt_Init(); //global descriptor table - defines code, data, and what it means to be lost and chase hopes down the highway.
     terminal_Write("GDT initialized. \n Before IDT. ");
     idt_Init(); // internal descriptor table - for internal CPU exceptions
-    terminal_Write("IDT initialized. \n Before PIC remapping \n");
+    terminal_Write("IDT initialized. \n Before Virtual memory manager initialization \n");
+    vmm_Init();
+    terminal_Write("VMM initialized. \n Before PIC remapping \n")
     pic_Remap(); //programmable interrupt controller - for external exceptions
     terminal_Write("PIC remap done. \n Before filling IDT \n");
-
-    
+   
     // filling the interrupt table (IDT) 
     // 
     registerInterruptHandler(32, irq0_Handler);
