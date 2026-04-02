@@ -4,6 +4,6 @@
 #include <stdint.h>
 
 void vmm_Init(void);
-void vmm_MapPage(uint32_t virtualAddr, uint32_t physicalAddr);
+void vmm_Map_Page(uint32_t virtualAddr, uint32_t physicalAddr, uint32_t flags);
 
 #endif

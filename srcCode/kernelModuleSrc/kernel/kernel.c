@@ -10,7 +10,9 @@
 #include "multiboot.h"  // multiboot protocol. needed for memory map.
 #include "memap.h" // memory map functionality , aka bitmap shenanighans.
 #include "pic.h"
+#include "vmm.h"
 #include "pmm.h"
+#include "heap.h"
 #include "gdt.h"
 #include "idt.h"
 #include "interruptDelegator.h"
@@ -47,7 +49,7 @@ void kmain(multibootInfo_t* mbInfo) {
     idt_Init(); // internal descriptor table - for internal CPU exceptions
     terminal_Write("IDT initialized. ");
    
-    terminal_Write(" \n Before PIC remapping \n")
+    terminal_Write(" \n Before PIC remapping \n");
     pic_Remap(); //programmable interrupt controller - for external exceptions
     terminal_Write("PIC remap done. \n \n Before Virtual memory manager initialization \n");
  
@@ -62,7 +64,17 @@ void kmain(multibootInfo_t* mbInfo) {
   //fix up the terminal writes up too, im 2 lazy rn
      vmm_Init();
 
+     //base address, size 4mb and 1mb respectively, heap grows UP TO HIGH ADDRESSES
+     heap_Init(0x400000, 0x100000);
 
+char* test = (char*)kmalloc(16);
+test[0] = 'O';
+test[1] = 'K';
+test[2] = '\0';
+
+terminal_Write(test);
+
+//test for heap
     asm volatile("sti"); // enable interrupts.
 
 

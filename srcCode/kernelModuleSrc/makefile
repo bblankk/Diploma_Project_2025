@@ -17,11 +17,13 @@ CFILES = \
 	$(SRCDIR)/PIC.c \
 	$(SRCDIR)/IRQHandler.c \
 	$(SRCDIR)/interruptDelegator.c \
+	$(SRCDIR)/heap.c \
 	$(SRCDIR)/vmm.c
 
 ASMFILES = \
 	$(SRCDIR)/multiBootHeader.asm \
 	$(SRCDIR)/GDT.asm \
+	$(SRCDIR)/paging.asm \
 	$(SRCDIR)/IDT.asm
 
 LDSCRIPT = linker.ld

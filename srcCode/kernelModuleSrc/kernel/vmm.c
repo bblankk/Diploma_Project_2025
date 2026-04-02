@@ -8,6 +8,9 @@ PMM manipulates the bitmap derived from the memmap. The bitmap and memmap are im
 #include "../include/vmm.h"
 #include "../include/pmm.h"
 
+#define PAGE_PRESENT 0x1
+#define PAGE_WRITE   0x2
+
 uint32_t* pageDirectory = 0; /*array of  1024 entries. or behaves like one, because it points to a contiguous memory strtucture ( a page ) 
 
 (aka 1024 entries, 4bytes per entry = 32 bits per entry, top 20bits is the address (split into top 10 PD bottom 10 PT) and bottom  12bits holds the flags  )
@@ -30,17 +33,23 @@ void vmm_Init(void) {
     //identity map first 4mb, a small safe buffer for when paging turns on
 for(uint32_t i = 0; i < 4 * 1024 * 1024; i += 4096)
 {
-    vmm_MapPage(i, i, PAGE_WRITE);
+    vmm_Map_Page(i, i, PAGE_WRITE); //flag = page writable
 }
 
-loadPageDirectory(pageDirectory);
-enablePaging();
+// loading page directory 
+asm volatile("mov %0, %%cr3" :: "r"(pageDirectory));
+
+// enables paging
+ uint32_t cr0;
+    asm volatile("mov %%cr0, %0" : "=r"(cr0));
+    cr0 |= 0x80000000;
+    asm volatile("mov %0, %%cr0" :: "r"(cr0));
 }
 
 
 
 //core functionality - when CPU sees virtual page x, go to physical page y
-  void vmm_MapPage(uint32_t virtualAddr, uint32_t physicalAddr, uint32_t flags)
+  void vmm_Map_Page(uint32_t virtualAddr, uint32_t physicalAddr, uint32_t flags)
 {
     uint32_t pageDirectoryIndex = virtualAddr >> 22;  //highest 10 bits
     uint32_t pageTableIndex = (virtualAddr >> 12) & 0x03FF;  //removes offset , keeps only mid 10 bits
@@ -66,19 +75,8 @@ enablePaging();
 }
 
 
-//for enabling paging
-static inline void loadPageDirectory(uint32_t* pd)
-{
-    asm volatile("mov %0, %%cr3" :: "r"(pd));
-}
 
-static inline void enablePaging()
-{
-    uint32_t cr0;
-    asm volatile("mov %%cr0, %0" : "=r"(cr0));
-    cr0 |= 0x80000000;
-    asm volatile("mov %0, %%cr0" :: "r"(cr0));
-}
+
 
 
 
